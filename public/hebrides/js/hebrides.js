@@ -71,29 +71,34 @@ $(document).ready(function() {
     // Make all the audio nodes we need
     // Connect to the <audio> element with the trumpet file in it
     var audioElement = document.getElementById('audio-player');
-    var audioFile = audioCtx.createMediaElementSource(audioElement);
+    var audioNode = audioCtx.createMediaElementSource(audioElement);
 
     // create  gain node
-    var gain = $('#gain').val();
     var gainNode = audioCtx.createGain();
-    gainNode.gain.value = gain;
+    gainNode.gain.value = $('#gain').val();
 
-    $('#gain').change(function(e) {
+    $('#gain').change(function() {
       gainNode.gain.value = $('#gain').val();
     });
 
     var pitchShift = PitchShift(audioCtx);
-
-    pitchShift.transpose = 1;
     pitchShift.wet.value = 1;
     pitchShift.dry.value = 0;
 
+    pitchShift.transpose = $('#pitch').val();
+    $('#pitch').change(function() {
+      pitchShift.transpose = $('#pitch').val();
+    });
 
-    audioFile.connect(gainNode);
+    audioNode.mediaElement.playbackRate = $('#rate').val();
+    $('#rate').change(function(e) {
+      audioNode.mediaElement.playbackRate = $('#rate').val();
+    });
+
+
+    audioNode.connect(gainNode);
     gainNode.connect(pitchShift);
     pitchShift.connect(audioCtx.destination);
-
-
 
     if ('ondeviceorientation' in window) {
       window.addEventListener('deviceorientation', function(event) {
