@@ -113,27 +113,35 @@ $(document).ready(function() {
         conducted = 0,
         beats = [];
 
+    var initiateConducting = function(timeStamp) {
+      conducted = 1;
+      var msPerBeat = (60 * 1000 / initialTempo);
+      beats = [timeStamp-(msPerBeat*6),timeStamp-(msPerBeat*5),timeStamp-(msPerBeat*4),timeStamp-(msPerBeat*3),timeStamp-(msPerBeat*2),timeStamp-msPerBeat,timeStamp];
+      firebase.database().ref("tempo").set(initialTempo);
+
+      youtubePlayer.pauseVideo();
+      clearInterval(audioMonitor);
+      clearInterval(videoMonitor);
+
+      $('#audio-player')[0].currentTime = playhead;
+      audioNode.mediaElement.playbackRate = 1.0;
+      $('#audio-player')[0].play();
+
+      conductingMonitor = setInterval(function () {
+        playhead = $('#audio-player')[0].currentTime;
+        $('#timer').text(Math.round(playhead));
+      }, 166);
+    };
+
+    var updateTempo = function(tempo) {
+      $('#bpm').text(tempo);
+      audioNode.mediaElement.playbackRate = tempo / initialTempo;
+      firebase.database().ref("tempo").set(tempo);
+    };
 
     var processBeat = function(timeStamp) {
-      if (conducted == 0) {
-        conducted = 1;
-        var msPerBeat = (60 * 1000 / initialTempo);
-        beats = [timeStamp-(msPerBeat*6),timeStamp-(msPerBeat*5),timeStamp-(msPerBeat*4),timeStamp-(msPerBeat*3),timeStamp-(msPerBeat*2),timeStamp-msPerBeat,timeStamp];
-        firebase.database().ref("tempo").set(initialTempo);
-
-        youtubePlayer.pauseVideo();
-        clearInterval(audioMonitor);
-        clearInterval(videoMonitor);
-
-        $('#audio-player')[0].currentTime = playhead;
-        audioNode.mediaElement.playbackRate = 1.0;
-        $('#audio-player')[0].play();
-
-        conductingMonitor = setInterval(function () {
-          playhead = $('#audio-player')[0].currentTime;
-          $('#timer').text(Math.round(playhead));
-        }, 166);
-
+      if (conducted == 0 || (timeStamp - beats[6]) > 2000) {
+        initiateConducting(timeStamp);
       } else {
         beats.shift();
         beats.push(timeStamp);
@@ -141,14 +149,18 @@ $(document).ready(function() {
           (beats[1] - beats[0] + beats[2] - beats[1]) +
           (beats[3] - beats[2] + beats[4] - beats[3]) * 2 +
           (beats[5] - beats[4] + beats[6] - beats[5]) * 4) / 14);
-        $('#bpm').text(tempo);
-        audioNode.mediaElement.playbackRate = tempo / initialTempo;
-        firebase.database().ref("tempo").set(tempo);
+        updateTempo(tempo);
       }
     }
+
 
     $('#bpm-tap').click(function(e) {
       processBeat(Date.now());
     });
+
+    firebase.database().ref("tempo").on('value',function(snapshot) {
+      tempo = snapshot.val()
+    });
+
   }
 });
