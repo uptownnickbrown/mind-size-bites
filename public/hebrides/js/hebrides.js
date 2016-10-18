@@ -97,8 +97,8 @@ $(document).ready(function() {
 
 
     audioNode.connect(gainNode);
-    gainNode.connect(pitchShift);
-    pitchShift.connect(audioCtx.destination);
+    gainNode.connect(audioCtx.destination);
+    //pitchShift.connect(audioCtx.destination);
 
     if ('ondeviceorientation' in window) {
       window.addEventListener('deviceorientation', function(event) {
