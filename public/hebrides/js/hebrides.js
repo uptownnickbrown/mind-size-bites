@@ -9,7 +9,7 @@ function onPlayerReady(event) {
 
     event.target.seekTo(playhead);
     event.target.playVideo();
-    
+
     videoMonitor = setInterval(function () {
       playhead = event.target.getCurrentTime();
       $('#timer').text(Math.round(playhead));
@@ -50,6 +50,27 @@ $(document).ready(function() {
     youtubePlayer.pauseVideo();
     clearInterval(videoMonitor);
   });
+
+  // Establish an audio context - need this to get audio output
+  var audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+
+  // Make all the audio nodes we need
+  // Connect to the <audio> element with the trumpet file in it
+  var audioElement = document.getElementById('audio-player');
+  var audioFile = audioCtx.createMediaElementSource(audioElement);
+
+  // create  gain node
+  var gain = $('#gain').val();
+  var gainNode = audioCtx.createGain();
+  gainNode.gain.value = gain;
+
+  $('#gain').change(function(e) {
+    gainNode.gain.value = $('#gain').val();
+  });
+
+
+  audioFile.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
 
   if ('ondeviceorientation' in window) {
     window.addEventListener('deviceorientation', function(event) {
