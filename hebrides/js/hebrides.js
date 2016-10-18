@@ -1,28 +1,49 @@
-$(document).ready(function() {
-  // Add youtube embed api
-  var tag = document.createElement('script');
-  tag.src = "https://www.youtube.com/iframe_api";
-  var firstScriptTag = document.getElementsByTagName('script')[0];
-  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+var timeMonitor,
+    playhead = 0;
 
-  // Set up youtube player
-  var player;
-  function onYouTubeIframeAPIReady() {
-    player = new YT.Player('video-player', {
-      height: '400',
-      width: '700',
-      videoId: 'CtJkEWCQEbE',
-      events: {
-        'onReady': onPlayerReady,
-        'onStateChange': onPlayerStateChange
-      }
-    });
-  }
-
-  function onPlayerReady(event) {
-    event.target.seekTo(32);
+function onPlayerReady(event) {
+  $('#play-video').click(function() {
+    event.target.seekTo(playhead);
     event.target.playVideo();
-  }
+    timeMonitor = setInterval(function () {
+      playhead = event.target.getCurrentTime();
+      console.log(playhead);
+      $('#timer').text(Math.round($('#audio-player')[0].currentTime));
+    }, 166);
+  });
+}
+
+// Set up youtube player
+var youtubePlayer;
+function onYouTubeIframeAPIReady() {
+  console.log('on youtube player ready');
+  youtubePlayer = new YT.Player('video-player', {
+    height: '400',
+    width: '700',
+    videoId: 'CtJkEWCQEbE',
+    events: {
+      'onReady': onPlayerReady
+    }
+  });
+}
+
+$(document).ready(function() {
+  $('#play-audio').click(function() {
+    console.log(playhead);
+    $('#audio-player')[0].currentTime = playhead;
+    $('#audio-player')[0].play();
+    timeMonitor = setInterval(function () {
+      playhead = $('#audio-player')[0].currentTime;
+      console.log(playhead);
+      $('#timer').text(Math.round($('#audio-player')[0].currentTime));
+    }, 166);
+  });
+
+  $('#stop').click(function() {
+    $('#audio-player')[0].pause();
+    youtubePlayer.pauseVideo();
+    clearInterval(timeMonitor);
+  });
 
   if ('ondeviceorientation' in window) {
     window.addEventListener('deviceorientation', function(event) {
