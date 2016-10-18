@@ -1,11 +1,16 @@
-var timeMonitor,
+var audioMonitor,
+    videoMonitor,
     playhead = 0;
 
 function onPlayerReady(event) {
   $('#play-video').click(function() {
+    $('#audio-player')[0].pause();
+    clearInterval(audioMonitor);
+
     event.target.seekTo(playhead);
     event.target.playVideo();
-    timeMonitor = setInterval(function () {
+    
+    videoMonitor = setInterval(function () {
       playhead = event.target.getCurrentTime();
       $('#timer').text(Math.round(playhead));
     }, 166);
@@ -27,9 +32,12 @@ function onYouTubeIframeAPIReady() {
 
 $(document).ready(function() {
   $('#play-audio').click(function() {
+    youtubePlayer.pauseVideo();
+    clearInterval(videoMonitor);
+
     $('#audio-player')[0].currentTime = playhead;
     $('#audio-player')[0].play();
-    timeMonitor = setInterval(function () {
+    audioMonitor = setInterval(function () {
       playhead = $('#audio-player')[0].currentTime;
       $('#timer').text(Math.round(playhead));
     }, 166);
@@ -37,8 +45,10 @@ $(document).ready(function() {
 
   $('#stop').click(function() {
     $('#audio-player')[0].pause();
+    clearInterval(audioMonitor);
+
     youtubePlayer.pauseVideo();
-    clearInterval(timeMonitor);
+    clearInterval(videoMonitor);
   });
 
   if ('ondeviceorientation' in window) {
