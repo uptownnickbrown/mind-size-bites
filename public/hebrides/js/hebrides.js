@@ -147,8 +147,8 @@ $(document).ready(function() {
         beats.push(timeStamp);
         tempo = 60 * 1000 / ((
           (beats[1] - beats[0] + beats[2] - beats[1]) +
-          (beats[3] - beats[2] + beats[4] - beats[3]) * 2 +
-          (beats[5] - beats[4] + beats[6] - beats[5]) * 4) / 14);
+          (beats[3] - beats[2] + beats[4] - beats[3]) * 3 +
+          (beats[5] - beats[4] + beats[6] - beats[5]) * 7) / 22);
         updateTempo(tempo);
       }
     }

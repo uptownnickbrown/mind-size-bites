@@ -21,8 +21,8 @@ $(document).ready(function() {
         beats.push(timeStamp);
         tempo = 60 * 1000 / ((
           (beats[1] - beats[0] + beats[2] - beats[1]) +
-          (beats[3] - beats[2] + beats[4] - beats[3]) * 2 +
-          (beats[5] - beats[4] + beats[6] - beats[5]) * 4) / 14);
+          (beats[3] - beats[2] + beats[4] - beats[3]) * 3 +
+          (beats[5] - beats[4] + beats[6] - beats[5]) * 7) / 22);
         $('#bpm').text(tempo);
         firebase.database().ref("hebrides/tempo").set(tempo);
     }
@@ -44,8 +44,8 @@ $(document).ready(function() {
     var eventCounter = 0;
     var beatTimeStamp = 0;
     //var beatCounter = 0;
-    var accelerationSensitivity = 6;
-    var timeSensitivity = 300;
+    var accelerationSensitivity = 10;
+    var timeSensitivity = 400;
     window.addEventListener('devicemotion', function(event) {
       eventCounter++;
       var x = Math.round(event.acceleration.x);
