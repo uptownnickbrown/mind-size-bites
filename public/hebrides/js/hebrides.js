@@ -1,4 +1,5 @@
-var PitchShift = require('soundbank-pitch-shift');
+// To pull this in you need to start browserifying again and include bundle.js in the index.html file
+//var PitchShift = require('soundbank-pitch-shift');
 
 $(document).ready(function() {
   function checkYouTube () {
@@ -86,14 +87,14 @@ $(document).ready(function() {
       gainNode.gain.value = $('#gain').val();
     });
 
-    var pitchShift = PitchShift(audioCtx);
-    pitchShift.wet.value = 1;
-    pitchShift.dry.value = 0;
+    // var pitchShift = PitchShift(audioCtx);
+    // pitchShift.wet.value = 1;
+    // pitchShift.dry.value = 0;
 
-    pitchShift.transpose = $('#pitch').val();
-    $('#pitch').change(function() {
-      pitchShift.transpose = $('#pitch').val();
-    });
+    // pitchShift.transpose = $('#pitch').val();
+    // $('#pitch').change(function() {
+    //   pitchShift.transpose = $('#pitch').val();
+    // });
 
     audioNode.mediaElement.playbackRate = $('#rate').val();
     $('#rate').change(function(e) {
@@ -103,7 +104,7 @@ $(document).ready(function() {
 
     audioNode.connect(gainNode);
     gainNode.connect(audioCtx.destination);
-    //pitchShift.connect(audioCtx.destination);
+    // pitchShift.connect(audioCtx.destination);
 
 
     var initialTempo = $('#bpm').text();
