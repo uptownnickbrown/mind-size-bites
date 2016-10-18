@@ -27,7 +27,7 @@ $(document).ready(function() {
         event.target.seekTo(playhead);
         event.target.playVideo();
 
-        videoMonitor = setInterval(function () {
+        var videoMonitor = setInterval(function () {
           playhead = event.target.getCurrentTime();
           $('#timer').text(Math.round(playhead));
         }, 166);
@@ -51,7 +51,7 @@ $(document).ready(function() {
 
       $('#audio-player')[0].currentTime = playhead;
       $('#audio-player')[0].play();
-      audioMonitor = setInterval(function () {
+      var audioMonitor = setInterval(function () {
         playhead = $('#audio-player')[0].currentTime;
         $('#timer').text(Math.round(playhead));
       }, 166);
@@ -63,6 +63,8 @@ $(document).ready(function() {
 
       youtubePlayer.pauseVideo();
       clearInterval(videoMonitor);
+
+      conducted = 0;
     });
 
     // Establish an audio context - need this to get audio output
@@ -99,6 +101,43 @@ $(document).ready(function() {
     audioNode.connect(gainNode);
     gainNode.connect(audioCtx.destination);
     //pitchShift.connect(audioCtx.destination);
+
+
+    var initialTempo = $('#bpm').text();
+    var tempo = initialTempo,
+        conducted = 0,
+        beats = [];
+
+    $('#bpm-tap').click(function(e) {
+      if (conducted == 0) {
+        conducted = 1;
+        var msPerBeat = (60 * 1000 / initialTempo);
+        beats = [e.timeStamp-(msPerBeat*3),e.timeStamp-(msPerBeat*2),e.timeStamp-msPerBeat,e.timeStamp];
+
+        youtubePlayer.pauseVideo();
+        clearInterval(audioMonitor);
+        clearInterval(videoMonitor);
+
+        $('#audio-player')[0].currentTime = playhead;
+        audioNode.mediaElement.playbackRate = 1.0;
+        $('#audio-player')[0].play();
+
+        var audioMonitor = setInterval(function () {
+          playhead = $('#audio-player')[0].currentTime;
+          $('#timer').text(Math.round(playhead));
+        }, 166);
+
+      } else {
+        beats.shift();
+        beats.push(e.timeStamp);
+      }
+      tempo = 60 * 1000 / (
+              ((beats[1] - beats[0]) +
+               (beats[2] - beats[1]) * 3 +
+               (beats[3] - beats[2]) * 6) / 10);
+
+      console.log(tempo);
+    });
 
     if ('ondeviceorientation' in window) {
       window.addEventListener('deviceorientation', function(event) {
