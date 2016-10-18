@@ -3,7 +3,6 @@ var PitchShift = require('soundbank-pitch-shift');
 $(document).ready(function() {
   function checkYouTube () {
      setTimeout(function () {
-       console.log(YT);
         if (YT.loaded == 0) {
            checkYouTube();
         } else {
@@ -17,17 +16,19 @@ $(document).ready(function() {
 
     var audioMonitor,
         videoMonitor,
+        conductingMonitor,
         playhead = 34;
 
     function onPlayerReady(event) {
       $('#play-video').click(function() {
         $('#audio-player')[0].pause();
         clearInterval(audioMonitor);
+        clearInterval(conductingMonitor);
 
         event.target.seekTo(playhead);
         event.target.playVideo();
 
-        var videoMonitor = setInterval(function () {
+        videoMonitor = setInterval(function () {
           playhead = event.target.getCurrentTime();
           $('#timer').text(Math.round(playhead));
         }, 166);
@@ -48,10 +49,11 @@ $(document).ready(function() {
     $('#play-audio').click(function() {
       youtubePlayer.pauseVideo();
       clearInterval(videoMonitor);
+      clearInterval(conductingMonitor);
 
       $('#audio-player')[0].currentTime = playhead;
       $('#audio-player')[0].play();
-      var audioMonitor = setInterval(function () {
+      audioMonitor = setInterval(function () {
         playhead = $('#audio-player')[0].currentTime;
         $('#timer').text(Math.round(playhead));
       }, 166);
@@ -60,6 +62,7 @@ $(document).ready(function() {
     $('#stop').click(function() {
       $('#audio-player')[0].pause();
       clearInterval(audioMonitor);
+      clearInterval(conductingMonitor);
 
       youtubePlayer.pauseVideo();
       clearInterval(videoMonitor);
@@ -108,11 +111,12 @@ $(document).ready(function() {
         conducted = 0,
         beats = [];
 
-    $('#bpm-tap').click(function(e) {
+
+    var processBeat = function(timeStamp) {
       if (conducted == 0) {
         conducted = 1;
         var msPerBeat = (60 * 1000 / initialTempo);
-        beats = [e.timeStamp-(msPerBeat*3),e.timeStamp-(msPerBeat*2),e.timeStamp-msPerBeat,e.timeStamp];
+        beats = [timeStamp-(msPerBeat*5),timeStamp-(msPerBeat*4),timeStamp-(msPerBeat*3),timeStamp-(msPerBeat*2),timeStamp-msPerBeat,timeStamp];
 
         youtubePlayer.pauseVideo();
         clearInterval(audioMonitor);
@@ -122,21 +126,35 @@ $(document).ready(function() {
         audioNode.mediaElement.playbackRate = 1.0;
         $('#audio-player')[0].play();
 
-        var audioMonitor = setInterval(function () {
+        conductingMonitor = setInterval(function () {
           playhead = $('#audio-player')[0].currentTime;
           $('#timer').text(Math.round(playhead));
         }, 166);
 
       } else {
-        beats.shift();
-        beats.push(e.timeStamp);
-      }
-      tempo = 60 * 1000 / (
-              ((beats[1] - beats[0]) +
-               (beats[2] - beats[1]) * 3 +
-               (beats[3] - beats[2]) * 6) / 10);
+        if (beats.length == 6) {
+          beats.push(timeStamp);
+        } else {
+          beats.shift();
+          beats.push(timeStamp);
 
-      console.log(tempo);
+          tempo = 60 * 1000 / ((
+            (beats[1] - beats[0] + beats[2] - beats[1]) +
+            (beats[3] - beats[2] + beats[4] - beats[3]) * 2 +
+            (beats[5] - beats[4] + beats[6] - beats[5]) * 4) / 14);
+
+          beats.shift();
+
+          $('#bpm').text(tempo);
+          audioNode.mediaElement.playbackRate = tempo / initialTempo;
+          console.log(tempo);
+          console.log(audioNode.mediaElement.playbackRate);
+        }
+      }
+    }
+
+    $('#bpm-tap').click(function(e) {
+      processBeat(Date.now());
     });
 
     if ('ondeviceorientation' in window) {
@@ -162,6 +180,7 @@ $(document).ready(function() {
           beatTimeStamp = event.timeStamp;
           beatCounter > 3 ? beatCounter = 1 : beatCounter++;
           console.log(beatCounter + '! At time: ' + beatTimeStamp);
+          processBeat(beatTimeStamp);
         }
         //console.log(event.acceleration.x,event.acceleration.y,event.acceleration.z);
         $('#acceleration-x').text(Math.round(event.acceleration.x));
