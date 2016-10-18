@@ -7,8 +7,7 @@ function onPlayerReady(event) {
     event.target.playVideo();
     timeMonitor = setInterval(function () {
       playhead = event.target.getCurrentTime();
-      console.log(playhead);
-      $('#timer').text(Math.round($('#audio-player')[0].currentTime));
+      $('#timer').text(Math.round(playhead));
     }, 166);
   });
 }
@@ -16,7 +15,6 @@ function onPlayerReady(event) {
 // Set up youtube player
 var youtubePlayer;
 function onYouTubeIframeAPIReady() {
-  console.log('on youtube player ready');
   youtubePlayer = new YT.Player('video-player', {
     height: '400',
     width: '700',
@@ -29,13 +27,11 @@ function onYouTubeIframeAPIReady() {
 
 $(document).ready(function() {
   $('#play-audio').click(function() {
-    console.log(playhead);
     $('#audio-player')[0].currentTime = playhead;
     $('#audio-player')[0].play();
     timeMonitor = setInterval(function () {
       playhead = $('#audio-player')[0].currentTime;
-      console.log(playhead);
-      $('#timer').text(Math.round($('#audio-player')[0].currentTime));
+      $('#timer').text(Math.round(playhead));
     }, 166);
   });
 
