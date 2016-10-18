@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>The Conductor's Baton</title>
+    <link rel="stylesheet" href="./css/hebrides.css" />
+  </head>
+   <body>
+      <h1>The Conductor's Baton</h1>
+      <div>
+        <span id="bpm">98</span> bpm
+      </div>
+      <button id="stop">Stop</button>
+      <button id="bpm-tap">Tap me!</button>
+      <div id="do-results">
+         <div id="do-info">
+            <p>
+               Coordinates:
+               (<span id="beta">null</span>,
+               <span id="gamma">null</span>,
+               <span id="alpha">null</span>)
+            </p>
+         </div>
+         <div id="dm-info">
+            <p>
+               Acceleration:
+               (<span id="acceleration-x">null</span>,
+               <span id="acceleration-y">null</span>,
+               <span id="acceleration-z">null</span>)
+               m/s<sup>2</sup>
+            </p>
+         </div>
+      </div>
+      <script src="https://www.gstatic.com/firebasejs/3.5.0/firebase.js"></script>
+      <script>
+        // Initialize Firebase
+        var config = {
+          apiKey: "AIzaSyAR3kyou3GlkfunnK2GPQ4r6b432Y6u6EE",
+          databaseURL: "https://mind-sized-bites.firebaseio.com"
+        };
+        firebase.initializeApp(config);
+      </script>
+      <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+      <script src="./js/baton.js"></script>
+   </body>
+</html>
