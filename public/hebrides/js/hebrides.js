@@ -108,16 +108,13 @@ $(document).ready(function() {
 
 
     var initialTempo = 1 * $('#bpm').text();
-    firebase.database().ref("tempo").set(initialTempo);
+
     var tempo = initialTempo,
         conducted = 0,
         beats = [];
 
-    var initiateConducting = function(timeStamp) {
+    var initiateConducting = function() {
       conducted = 1;
-      var msPerBeat = (60 * 1000 / initialTempo);
-      beats = [timeStamp-(msPerBeat*6),timeStamp-(msPerBeat*5),timeStamp-(msPerBeat*4),timeStamp-(msPerBeat*3),timeStamp-(msPerBeat*2),timeStamp-msPerBeat,timeStamp];
-      firebase.database().ref("tempo").set(initialTempo);
 
       youtubePlayer.pauseVideo();
       clearInterval(audioMonitor);
@@ -136,12 +133,15 @@ $(document).ready(function() {
     var updateTempo = function(tempo) {
       $('#bpm').text(tempo);
       audioNode.mediaElement.playbackRate = tempo / initialTempo;
-      firebase.database().ref("tempo").set(tempo);
+      firebase.database().ref("hebrides/tempo").set(tempo);
     };
 
     var processBeat = function(timeStamp) {
       if (conducted == 0 || (timeStamp - beats[6]) > 2000) {
-        initiateConducting(timeStamp);
+        var msPerBeat = (60 * 1000 / initialTempo);
+        beats = [timeStamp-(msPerBeat*6),timeStamp-(msPerBeat*5),timeStamp-(msPerBeat*4),timeStamp-(msPerBeat*3),timeStamp-(msPerBeat*2),timeStamp-msPerBeat,timeStamp];
+        firebase.database().ref("hebrides/tempo").set(initialTempo);
+        initiateConducting();
       } else {
         beats.shift();
         beats.push(timeStamp);
@@ -153,13 +153,22 @@ $(document).ready(function() {
       }
     }
 
-
     $('#bpm-tap').click(function(e) {
       processBeat(Date.now());
     });
 
-    firebase.database().ref("tempo").on('value',function(snapshot) {
-      tempo = snapshot.val()
+    $('#baton').change(function(e) {
+      if ($('#baton').is(':checked')) {
+        firebase.database().ref("hebrides/tempo").set(initialTempo);
+        firebase.database().ref("hebrides").on('child_changed',function(snapshot) {
+          if (conducted == 0) {
+            initiateConducting();
+          } else {
+            tempo = snapshot.val();
+            updateTempo(tempo);
+          }
+        });
+      }
     });
 
   }

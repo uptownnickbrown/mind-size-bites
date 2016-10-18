@@ -1,10 +1,8 @@
 $(document).ready(function() {
   var initialTempo = $('#bpm').text() * 1;
-  firebase.database().ref("tempo").set(initialTempo);
 
   $('#stop').click(function() {
     conducted = 0;
-    firebase.database().ref("tempo").set(initialTempo);
     $('#bpm').text(initialTempo);
   });
 
@@ -13,11 +11,11 @@ $(document).ready(function() {
       beats = [];
 
   var processBeat = function(timeStamp) {
-    if (conducted == 0 || (timeStamp - beats[6]) > 1500) {
+    if (conducted == 0 || (timeStamp - beats[6]) > 2000) {
       conducted = 1;
       var msPerBeat = (60 * 1000 / initialTempo);
       beats = [timeStamp-(msPerBeat*6),timeStamp-(msPerBeat*5),timeStamp-(msPerBeat*4),timeStamp-(msPerBeat*3),timeStamp-(msPerBeat*2),timeStamp-msPerBeat,timeStamp];
-      firebase.database().ref("tempo").set(initialTempo);
+      firebase.database().ref("hebrides/tempo").set(initialTempo);
     } else {
         beats.shift();
         beats.push(timeStamp);
@@ -26,7 +24,7 @@ $(document).ready(function() {
           (beats[3] - beats[2] + beats[4] - beats[3]) * 2 +
           (beats[5] - beats[4] + beats[6] - beats[5]) * 4) / 14);
         $('#bpm').text(tempo);
-        firebase.database().ref("tempo").set(tempo);
+        firebase.database().ref("hebrides/tempo").set(tempo);
     }
   }
 
@@ -45,9 +43,9 @@ $(document).ready(function() {
   if ('ondevicemotion' in window) {
     var eventCounter = 0;
     var beatTimeStamp = 0;
-    var beatCounter = 0;
-    var accelerationSensitivity = 8;
-    var timeSensitivity = 500;
+    //var beatCounter = 0;
+    var accelerationSensitivity = 6;
+    var timeSensitivity = 300;
     window.addEventListener('devicemotion', function(event) {
       eventCounter++;
       var x = Math.round(event.acceleration.x);
@@ -55,8 +53,11 @@ $(document).ready(function() {
       var z = Math.round(event.acceleration.z);
       if ((x > accelerationSensitivity || y > accelerationSensitivity || z > accelerationSensitivity) && ((event.timeStamp - beatTimeStamp) > timeSensitivity) ) {
         beatTimeStamp = event.timeStamp;
-        beatCounter > 3 ? beatCounter = 1 : beatCounter++;
-        console.log(beatCounter + '! At time: ' + beatTimeStamp);
+        // beatCounter > 3 ? beatCounter = 1 : beatCounter++;
+        // console.log(beatCounter + '! At time: ' + beatTimeStamp);
+        // TODO add some detection for missed beats
+        // use acceleration pattern of a downbeat, if detected set beatCounter to 0
+        // and compensate for the missed time
         processBeat(beatTimeStamp);
       }
       //console.log(event.acceleration.x,event.acceleration.y,event.acceleration.z);
