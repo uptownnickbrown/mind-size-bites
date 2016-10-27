@@ -3,6 +3,7 @@ General:
 * tweak layout (more real estate)
 * design/layout for chapters (steal from VCS? other book?)
 * wrap it up in an EPUB 3, ingest into Bookshelf
+* Add section intro / 1st / last slides
 
 Hebrides:
 * add boilerplate content on Mendellsohn / Hebrides
