@@ -1,0 +1,78 @@
+/* General styles */
+
+body {
+    font-family: Roboto, Helvetica, Arial;
+    font-size: .9em;
+    color: #333;
+    margin: 0;
+}
+
+.my-notebook {
+    margin: 30px auto;
+    width:85%;
+    max-width:768px;
+    font-family: Roboto, Helvetica, Arial;
+    font-size: 1.1em;
+    border-spacing: 0px;
+}
+
+.my-notebook th {
+    font-size: 1.4em;
+    padding: 6px 6px 6px 6px;
+    font-weight: 400;
+}
+
+.my-notebook tr {
+    margin-bottom: .5em;
+}
+
+.my-notebook td {
+    padding: 12px;
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #eee;
+}
+tbody tr:nth-child(even) {
+    background-color: #ccc;
+}
+thead tr {
+    background-color: #0e508a;
+    color: #fff;
+}
+thead tr th:first-child {
+    border-top-left-radius: 8px;
+    padding-left: `12px;
+}
+thead tr th:last-child {
+    border-top-right-radius: 8px;
+    padding-right: 12px;
+}
+
+tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 8px;
+}
+tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 8px;
+}
+
+td {
+    text-align: left;
+}
+
+/* Media Queries have to come last */
+
+@media screen and (max-width: 1260px) {
+    .my-notebook {
+        font-size: 1em;
+    }
+}
+@media screen and (max-width: 1100px) {
+    .my-notebook {
+        font-size: .9em;
+    }
+    .value {
+        width: 2%;
+        text-align: center;
+    }
+}

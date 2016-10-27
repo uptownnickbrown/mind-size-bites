@@ -1,0 +1,104 @@
+#bs_logo {
+	background : 0;
+	border : 0;
+	box-shadow : none;
+}
+
+.comboImage {
+    float:left;
+    margin-left: 6%;
+    width: 50%;
+    margin-top: 50px;
+}
+
+#dragon_img {
+    background : 0;
+	border : 0;
+	box-shadow : none;
+}
+
+#dragon_bullets {
+    margin-top:30px;
+}
+
+.frontbullets li {
+    font-size: 24px;
+    text-align: left;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    line-height:30px;
+
+}
+
+.comboBullets {
+	font-size: 10px;
+    float: left;
+    
+    margin-top:50px;
+    max-width:49%;
+
+}
+
+.comboBullets p {
+	font-size: 24px;
+	text-align: left;
+	  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+}
+
+.jigsaw-calls {
+    width:100%;
+    max-width:1096px;
+    max-height:800px;
+    height:auto;
+    margin-top:50px;
+}
+
+.embed {
+    width: 100%;
+    height: 100%;
+    max-width: 1024px;
+    min-width: 768px;
+    min-height: 600px;
+    max-height: 768px;
+    margin: 50px auto;
+    background:white;
+    border: 1px solid black;
+}
+
+.inset {
+    background:none;
+    width: 1024px;
+    height: 600px;
+    margin: 50px auto;
+}
+
+.insetNotebook {
+    background:none;
+    width: 1024px;
+    height: 680px;
+    margin: 20px auto;
+}
+
+.title-1.bookshelf {
+    background: rgb(255,130,0);   
+}
+
+.screen-image {
+	max-width: 1866px;
+	max-height: 993px;
+}
+
+.image_caption {
+  font-family:'Roboto';
+  font-weight:100 !important;
+}
+
+#embed_one {
+  width:100%;
+  height:660px;
+}
+
+#embed_one > iframe {
+  height: 660px !important;
+}
