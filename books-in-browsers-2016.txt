@@ -1,0 +1,31 @@
+books-in-browsers talk
+
+Work off of the MVJ demo - the presentation itself is an EPUB reader.
+
+Lots of decks are HTML pages or EPUB docs - this one is a reader!
+
+I was a music major, and let me tell you a music textbook without music is dull. Unless you're Mozart, reading a complex piece like this one is near impossible. Especially if you're new or struggling.
+
+Music is also begging for new input modes like recording, new interactions like drawing notes, keyboards to play a tune....so many possibilities.
+
+So here's our reader and I want to walk you through some chapters in what we think a next gen music textbook could be.
+
+* play music (sound slice?)
+* Spotify integration
+* record audio, play it back
+* on screen keyboard, play back a tune
+* play along to a track
+* draw notes on a staff, guess if they're right
+* integrate with deepjazz, make a model off my tune
+* timbre explorer (multitouch)
+* timbre analysis and Fourier transform
+* email me my song (mailgun)
+* twilio integration (text a number for some reason)
+* play rock band
+* Watson avatar with beethoven type stuff
+* more...
+
+* record interaction
+* report back results (what key is this in?)
+
+-Nick
