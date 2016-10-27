@@ -1,5 +1,5 @@
 General:
-* build preso wrapper (reuse MVJ preso?) - LearnKit SDK preso: http://localhost:8001/#/3
+* ~~build preso wrapper (reuse MVJ preso?) - LearnKit SDK preso: http://localhost:8001/#/3~~
 * tweak layout (more real estate)
 * design/layout for chapters (steal from VCS? other book?)
 * wrap it up in an EPUB 3, ingest into Bookshelf
@@ -34,6 +34,6 @@ https://cnx.org/contents/hIRWxta7@1/Chapter-5--European-and-Americ
 * stretch goal...build the live collaborative In C across the network
 
 LearnKit:
-* Re-order LearnKit slides: 0 -> 4 -> 6 -> 2 -> 3
+* ~~Re-order LearnKit slides: 0 -> 4 -> 6 -> 2 -> 3~~
 * embed snippet viewer with sliders for start / stop point
 * create some GPS content for my ingested music book?
