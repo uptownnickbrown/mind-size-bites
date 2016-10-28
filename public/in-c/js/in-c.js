@@ -1,3 +1,6 @@
+function inC () {
+
+  // TODO externalize this
   var score = [
     {
       "number": 1,
@@ -569,41 +572,114 @@
       ]
     }
   ];
+
+  this.tempo = 240;
+  this.phraseCounter = 0;
+
+  this.getCurrentPhrase = function() {
+    return this.phraseCounter;
   }
-];
+
+  this.init = function() {
+    var eighthNoteMilliseconds = 60 * 1000 / this.tempo;
+    console.log("millisec per eighth note: " + eighthNoteMilliseconds);
+
+    MIDI.setVolume(0, 80);
+    MIDI.programChange(0, MIDI.GM.byName["marimba"].number);
+
+    // Set up first performer
+    MIDI.setVolume(1, 80);
+    MIDI.programChange(1, MIDI.GM.byName["acoustic_grand_piano"].number);
+
+    var nextPhraseStart = 6;
+    var beat = 0;
+
+    new Date;
+    var start = Date.now();
+
+    var self = this;
+    var metronome = setInterval(function() {
+      console.log(self);
+      if (nextPhraseStart == beat) {
+        var phraseScore = score[self.phraseCounter].score;
+        var phraseInstructions = [];
+        var phraseDuration = 0;
+        var phraseNoteCount = phraseScore.length;
+        var i = 0;
+
+        phraseScore.forEach(function(note) {
+          var duration = note.duration;
+          var velocity = note.velocity;
+          if (note.pitch) {
+            var pitchValue = MIDI.keyToNote[note.pitch];
+            var noteOn = {
+              "type": "on",
+              "channel": 1,
+              "pitch": pitchValue,
+              "velocity": velocity,
+              "duration": duration,
+              "targetBeat": phraseDuration * 2,
+              "delay": (phraseDuration * eighthNoteMilliseconds + 10) / 1000
+            };
+            phraseInstructions.push(noteOn);
+
+            var noteOff = {
+              "type":"off",
+              "channel":1,
+              "pitch":pitchValue,
+              "duration": duration,
+              "targetBeat": phraseDuration * 2,
+              "delay": (phraseDuration * eighthNoteMilliseconds + (note.grace ? (eighthNoteMilliseconds / 6) : (duration * eighthNoteMilliseconds - 50))) / 1000
+            };
+            phraseInstructions.push(noteOff);
+          }
+          phraseDuration += duration;
+        });
+        nextPhraseStart = beat + phraseDuration * 2;
+        phraseInstructions.forEach(function(instruction) {
+          if (instruction.type == "on") {
+            console.log('sending note on note ' + instruction.pitch + ', ' + instruction.delay + ' ms from now');
+            MIDI.noteOn(instruction.channel, instruction.pitch, instruction.velocity, instruction.delay);
+          } else {
+            console.log('sending note off for note ' + instruction.pitch + ', ' + instruction.delay + ' ms from now');
+            MIDI.noteOff(instruction.channel, instruction.pitch, instruction.delay);
+          }
+        });
+      }
+
+      if (beat % 2 == 0) {
+        var elapsed = Date.now() - start;
+        console.log('metronome: ' + beat + ' at ' + elapsed);
+        MIDI.noteOn(0, 72, 100, 0);
+        MIDI.noteOff(0, 72, 0.25);
+      }
+      beat += 1;
+      if (beat % (Math.floor(Math.random() * 16) + 23) == 0) {
+        self.phraseCounter += 1;
+        console.log(self);
+        console.log(window.inC);
+      }
+
+    }, eighthNoteMilliseconds / 2);
+
+
+
+
+  }
+  this.init();
+};
 
 $(document).ready(function() {
-  var inC = {
-    init : function() {
-      var note = 72; // the MIDI note
-      var velocity = 100; // how hard the note hits
-      // play the note
-      MIDI.setVolume(0, 100);
-      MIDI.setVolume(1, 80);
-      MIDI.setVolume(2, 60);
-      MIDI.programChange(0, MIDI.GM.byName["woodblock"].number);
-      MIDI.programChange(1, MIDI.GM.byName["marimba"].number);
-      MIDI.programChange(2, MIDI.GM.byName["vibraphone"].number);
 
-      //MIDI.noteOn(channel, note, velocity, delay);
-
-      var start = new Date().getTime()
-      var metronome = setInterval(function() {
-        var time = new Date().getTime() - start;
-        MIDI.noteOn(1, 72, 100, 0);
-        MIDI.noteOff(1, 72, 0.25);
-      }, 272);
-    }
-  };
 
   	MIDI.loadPlugin({
   		soundfontUrl: "./audio/",
-  		instruments: [ "woodblock", "marimba", "vibraphone" ],
+  		instruments: [ "acoustic_grand_piano", "marimba"],
   		onprogress: function(state, progress) {
   			console.log(state, progress);
   		},
   		onsuccess: function() {
-        inC.init();
+        window.inC = new inC();
   		}
   	});
 });
