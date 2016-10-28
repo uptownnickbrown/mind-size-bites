@@ -1,7 +1,7 @@
 function inC () {
 
-  // TODO externalize this
-  var score = [
+  // TODO externalize the score
+  this.score = [
     {
       "number": 1,
       "score": [
@@ -574,15 +574,27 @@ function inC () {
   ];
 
   this.tempo = 240;
-  this.phraseCounter = 0;
+  this.performers = {};
 
-  this.getCurrentPhrase = function() {
-    return this.phraseCounter;
-  }
+  this.addPerformer = function(id,instrument) {
+    this.performers[id] = {
+      "instrumentName":instrument,
+      "currentPhrase":0,
+      "nextPhraseStart":4,
+      "advancePhrase":0
+    };
+  };
+
+  this.advancePerformer = function(id) {
+    this.performers[id].advancePhrase += 1;
+  };
+
+  this.removePerformer = function(id) {
+    delete this.performers[id];
+  };
 
   this.init = function() {
     var eighthNoteMilliseconds = 60 * 1000 / this.tempo;
-    console.log("millisec per eighth note: " + eighthNoteMilliseconds);
 
     MIDI.setVolume(0, 80);
     MIDI.programChange(0, MIDI.GM.byName["marimba"].number);
@@ -591,93 +603,100 @@ function inC () {
     MIDI.setVolume(1, 80);
     MIDI.programChange(1, MIDI.GM.byName["acoustic_grand_piano"].number);
 
-    var nextPhraseStart = 6;
+    var self = this;
     var beat = 0;
 
-    new Date;
-    var start = Date.now();
-
-    var self = this;
     var metronome = setInterval(function() {
-      console.log(self);
-      if (nextPhraseStart == beat) {
-        var phraseScore = score[self.phraseCounter].score;
-        var phraseInstructions = [];
-        var phraseDuration = 0;
-        var phraseNoteCount = phraseScore.length;
-        var i = 0;
 
-        phraseScore.forEach(function(note) {
-          var duration = note.duration;
-          var velocity = note.velocity;
-          if (note.pitch) {
-            var pitchValue = MIDI.keyToNote[note.pitch];
-            var noteOn = {
-              "type": "on",
-              "channel": 1,
-              "pitch": pitchValue,
-              "velocity": velocity,
-              "duration": duration,
-              "targetBeat": phraseDuration * 2,
-              "delay": (phraseDuration * eighthNoteMilliseconds + 10) / 1000
-            };
-            phraseInstructions.push(noteOn);
-
-            var noteOff = {
-              "type":"off",
-              "channel":1,
-              "pitch":pitchValue,
-              "duration": duration,
-              "targetBeat": phraseDuration * 2,
-              "delay": (phraseDuration * eighthNoteMilliseconds + (note.grace ? (eighthNoteMilliseconds / 6) : (duration * eighthNoteMilliseconds - 50))) / 1000
-            };
-            phraseInstructions.push(noteOff);
+      Object.keys(self.performers).forEach(function(key){
+        if (self.performers[key].nextPhraseStart == beat) {
+          if (self.performers[key].advancePhrase > 0) {
+            self.performers[key].currentPhrase = self.performers[key].currentPhrase + 1;
+            if (self.performers[key].currentPhrase > 51) {
+              self.removePerformer(key);
+            }
+            self.performers[key].advancePhrase = self.performers[key].advancePhrase - 1;
+            $('.current').html(self.performers["nick"].currentPhrase);
+            $('.expected').html(self.performers["nick"].advancePhrase);
           }
-          phraseDuration += duration;
-        });
-        nextPhraseStart = beat + phraseDuration * 2;
-        phraseInstructions.forEach(function(instruction) {
-          if (instruction.type == "on") {
-            console.log('sending note on note ' + instruction.pitch + ', ' + instruction.delay + ' ms from now');
-            MIDI.noteOn(instruction.channel, instruction.pitch, instruction.velocity, instruction.delay);
-          } else {
-            console.log('sending note off for note ' + instruction.pitch + ', ' + instruction.delay + ' ms from now');
-            MIDI.noteOff(instruction.channel, instruction.pitch, instruction.delay);
-          }
-        });
-      }
+          var phraseScore = self.score[self.performers[key].currentPhrase].score;
+          var phraseInstructions = [];
+          var phraseDuration = 0;
+          var phraseNoteCount = phraseScore.length;
+          var i = 0;
 
+          phraseScore.forEach(function(note) {
+            var duration = note.duration;
+            var velocity = note.velocity;
+            if (note.pitch) {
+              var pitchValue = MIDI.keyToNote[note.pitch];
+              var noteOn = {
+                "type": "on",
+                "channel": 1,
+                "pitch": pitchValue,
+                "velocity": velocity,
+                "duration": duration,
+                "targetBeat": phraseDuration * 2,
+                "delay": (phraseDuration * eighthNoteMilliseconds + 10) / 1000
+              };
+              phraseInstructions.push(noteOn);
+
+              var noteOff = {
+                "type":"off",
+                "channel":1,
+                "pitch":pitchValue,
+                "duration": duration,
+                "targetBeat": phraseDuration * 2,
+                "delay": (phraseDuration * eighthNoteMilliseconds + (note.grace ? (eighthNoteMilliseconds / 6) : (duration * eighthNoteMilliseconds - 50))) / 1000
+              };
+              phraseInstructions.push(noteOff);
+            }
+            phraseDuration += duration;
+          });
+          self.performers[key].nextPhraseStart = beat + phraseDuration * 2;
+          phraseInstructions.forEach(function(instruction) {
+            if (instruction.type == "on") {
+              MIDI.noteOn(instruction.channel, instruction.pitch, instruction.velocity, instruction.delay);
+            } else {
+              MIDI.noteOff(instruction.channel, instruction.pitch, instruction.delay);
+            }
+          });
+        }
+      });
       if (beat % 2 == 0) {
-        var elapsed = Date.now() - start;
-        console.log('metronome: ' + beat + ' at ' + elapsed);
         MIDI.noteOn(0, 72, 100, 0);
         MIDI.noteOff(0, 72, 0.25);
       }
       beat += 1;
-      if (beat % (Math.floor(Math.random() * 16) + 23) == 0) {
-        self.phraseCounter += 1;
-        console.log(self);
-        console.log(window.inC);
-      }
+      // randomize phrase progression
+      //if (beat % (Math.floor(Math.random() * 16) + 23) == 0) {
+      //  self.phraseCounter += 1;
+      //}
 
     }, eighthNoteMilliseconds / 2);
-
-
-
-
   }
-  this.init();
+
+  var self = this;
+
+  $('.start').click(function(e){
+    e.preventDefault();
+    self.addPerformer("nick","acoustic_grand_piano");
+    self.init();
+  });
+
+  $('.advance').click(function(e){
+    e.preventDefault();
+    self.advancePerformer("nick");
+    $('.expected').html(self.performers["nick"].advancePhrase);
+  });
+
+
 };
 
 $(document).ready(function() {
-
-
   	MIDI.loadPlugin({
   		soundfontUrl: "./audio/",
   		instruments: [ "acoustic_grand_piano", "marimba"],
-  		onprogress: function(state, progress) {
-  			console.log(state, progress);
-  		},
   		onsuccess: function() {
         window.inC = new inC();
   		}
