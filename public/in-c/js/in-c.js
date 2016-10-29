@@ -574,8 +574,11 @@ function inC () {
   ];
 
   this.tempo = 220;
+  firebase.database().ref("inC/tempo").set(this.tempo);
   this.performers = {};
+  firebase.database().ref("inC/performers").set(this.performers);
   this.availableChannel = 1;
+  firebase.database().ref("inC/availableChannel").set(this.availableChannel);
 
   this.addPerformer = function(id,instrument) {
     this.performers[id] = {
@@ -589,14 +592,18 @@ function inC () {
     MIDI.setVolume(this.availableChannel, 100);
     MIDI.programChange(this.availableChannel, MIDI.GM.byName[instrument].number);
     this.availableChannel += 1;
+    firebase.database().ref("inC/performers").set(this.performers);
+    firebase.database().ref("inC/availableChannel").set(this.availableChannel);
   };
 
   this.advancePerformer = function(id) {
     this.performers[id].advancePhrase += 1;
+    firebase.database().ref("inC/performers").set(this.performers);
   };
 
   this.removePerformer = function(id) {
     delete this.performers[id];
+    firebase.database().ref("inC/performers").set(this.performers);
   };
 
   this.init = function() {
