@@ -573,16 +573,22 @@ function inC () {
     }
   ];
 
-  this.tempo = 240;
+  this.tempo = 220;
   this.performers = {};
+  this.availableChannel = 1;
 
   this.addPerformer = function(id,instrument) {
     this.performers[id] = {
+      "channel":this.availableChannel,
       "instrumentName":instrument,
-      "currentPhrase":0,
+      "currentPhrase":1,
       "nextPhraseStart":4,
       "advancePhrase":0
     };
+    // Set up performer audio Channel
+    MIDI.setVolume(this.availableChannel, 100);
+    MIDI.programChange(this.availableChannel, MIDI.GM.byName[instrument].number);
+    this.availableChannel += 1;
   };
 
   this.advancePerformer = function(id) {
@@ -596,12 +602,8 @@ function inC () {
   this.init = function() {
     var eighthNoteMilliseconds = 60 * 1000 / this.tempo;
 
-    MIDI.setVolume(0, 80);
+    MIDI.setVolume(0, 60);
     MIDI.programChange(0, MIDI.GM.byName["marimba"].number);
-
-    // Set up first performer
-    MIDI.setVolume(1, 80);
-    MIDI.programChange(1, MIDI.GM.byName["acoustic_grand_piano"].number);
 
     var self = this;
     var beat = 0;
@@ -612,14 +614,16 @@ function inC () {
         if (self.performers[key].nextPhraseStart == beat) {
           if (self.performers[key].advancePhrase > 0) {
             self.performers[key].currentPhrase = self.performers[key].currentPhrase + 1;
-            if (self.performers[key].currentPhrase > 51) {
+            self.performers[key].advancePhrase = self.performers[key].advancePhrase - 1;
+            $('.current.' + key + ' span').html(self.performers[key].currentPhrase);
+            $('.current.' + key + '  img').attr("src", "./images/" + self.performers[key].currentPhrase + ".png");
+            $('.expected.' + key).html(self.performers[key].advancePhrase);
+            if (self.performers[key].currentPhrase > 53) {
               self.removePerformer(key);
             }
-            self.performers[key].advancePhrase = self.performers[key].advancePhrase - 1;
-            $('.current').html(self.performers["nick"].currentPhrase);
-            $('.expected').html(self.performers["nick"].advancePhrase);
           }
-          var phraseScore = self.score[self.performers[key].currentPhrase].score;
+          var scoreIndex = (self.performers[key].currentPhrase - 1);
+          var phraseScore = self.score[scoreIndex].score;
           var phraseInstructions = [];
           var phraseDuration = 0;
           var phraseNoteCount = phraseScore.length;
@@ -632,7 +636,7 @@ function inC () {
               var pitchValue = MIDI.keyToNote[note.pitch];
               var noteOn = {
                 "type": "on",
-                "channel": 1,
+                "channel": self.performers[key].channel,
                 "pitch": pitchValue,
                 "velocity": velocity,
                 "duration": duration,
@@ -643,11 +647,11 @@ function inC () {
 
               var noteOff = {
                 "type":"off",
-                "channel":1,
+                "channel":self.performers[key].channel,
                 "pitch":pitchValue,
                 "duration": duration,
                 "targetBeat": phraseDuration * 2,
-                "delay": (phraseDuration * eighthNoteMilliseconds + (note.grace ? (eighthNoteMilliseconds / 6) : (duration * eighthNoteMilliseconds - 50))) / 1000
+                "delay": (phraseDuration * eighthNoteMilliseconds + (note.grace ? (eighthNoteMilliseconds / 4) : (duration * eighthNoteMilliseconds - 25))) / 1000
               };
               phraseInstructions.push(noteOff);
             }
@@ -677,17 +681,35 @@ function inC () {
   }
 
   var self = this;
-
   $('.start').click(function(e){
     e.preventDefault();
     self.addPerformer("nick","acoustic_grand_piano");
+    self.addPerformer("adrienne","marimba");
+    self.addPerformer("three","oboe");
+    self.addPerformer("four","viola");
     self.init();
   });
 
-  $('.advance').click(function(e){
+  $('.advance.nick').click(function(e){
     e.preventDefault();
     self.advancePerformer("nick");
-    $('.expected').html(self.performers["nick"].advancePhrase);
+    $('.expected.nick').html(self.performers["nick"].advancePhrase);
+  });
+
+  $('.advance.adrienne').click(function(e){
+    e.preventDefault();
+    self.advancePerformer("adrienne");
+    $('.expected.adrienne').html(self.performers["adrienne"].advancePhrase);
+  });
+  $('.advance.three').click(function(e){
+    e.preventDefault();
+    self.advancePerformer("three");
+    $('.expected.three').html(self.performers["three"].advancePhrase);
+  });
+  $('.advance.four').click(function(e){
+    e.preventDefault();
+    self.advancePerformer("four");
+    $('.expected.four').html(self.performers["four"].advancePhrase);
   });
 
 
@@ -696,7 +718,7 @@ function inC () {
 $(document).ready(function() {
   	MIDI.loadPlugin({
   		soundfontUrl: "./audio/",
-  		instruments: [ "acoustic_grand_piano", "marimba"],
+  		instruments: [ "acoustic_grand_piano", "oboe", "viola", "marimba"],
   		onsuccess: function() {
         window.inC = new inC();
   		}

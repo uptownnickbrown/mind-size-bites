@@ -1,0 +1,48 @@
+h2 {
+  margin:50px auto;
+  text-align:center;
+  font-size:3.4em;
+}
+
+* {
+  font-family:'Roboto', sans-serif;
+  font-size:1em;
+  font-weight:300;
+}
+
+.start {
+  display:block;
+  width:80%;
+  height:40px;
+  margin: 25px auto;
+}
+
+.player.nick {
+  clear:both;
+  float:left;
+  width:45%;
+  text-align:center
+}
+.player.adrienne {
+  float:right;
+  width:45%;
+  text-align:center
+}
+
+.player.three {
+  clear:both;
+  float:left;
+  width:45%;
+  text-align:center
+}
+.player.four {
+  float:right;
+  width:45%;
+  text-align:center
+}
+
+img {
+  height:200px;
+  margin:20px auto;
+  display:block;
+}
