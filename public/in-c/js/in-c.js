@@ -599,6 +599,8 @@ function inC () {
 
   this.tempo = 240;
   this.performers = {};
+  // TODO store this in local storage so it persists across refreshes
+  this.myPerformers = [];
   this.availableChannel = 1;
 
   var self = this;
@@ -614,7 +616,8 @@ function inC () {
       Object.keys(self.performers).forEach(function(performerId) {
         var performer = self.performers[performerId];
         self.performers[performerId]['nextPhraseStart'] = performer['nextPhraseStart'] - (normalizeToBeatNumber - 4);
-        self.setupPerformer(performerId);
+        // TODO add detection for who owns this performer
+        self.setupPerformer(performerId,0);
         MIDI.setVolume(performer.channel, 100);
         MIDI.programChange(performer.channel, MIDI.GM.byName[performer.instrumentName].number);
       });
@@ -650,21 +653,26 @@ function inC () {
       "nextPhraseStart":normalizeToBeatNumber,
       "advanceToPhrase":1
     };
+    this.myPerformers.push(id);
     // Set up performer audio Channel
     MIDI.setVolume(this.availableChannel, 100);
     MIDI.programChange(this.availableChannel, MIDI.GM.byName[instrument].number);
     this.availableChannel += 1;
     firebase.database().ref("inC/availableChannel").set(this.availableChannel);
     firebase.database().ref("inC/performers").set(this.performers);
-    this.setupPerformer(id);
+    this.setupPerformer(id,1);
   }
 
-  this.setupPerformer = function(id) {
-    $('.performers').append('<div class="player" id="' + id + '"><button class="advance">Advance</button><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div></div>');
-    $('#' + id + ' .advance').click(function(e){
-      e.preventDefault();
-      self.advanceByOne(id);
-    });
+  this.setupPerformer = function(id,mine) {
+    if (mine) {
+      $('.performers').prepend('<div class="player" id="' + id + '"><button class="advance">Advance</button><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div></div>');
+      $('#' + id + ' .advance').click(function(e){
+        e.preventDefault();
+        self.advanceByOne(id);
+      });
+    } else {
+      $('.performers').append('<div class="player" id="' + id + '"><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div></div>');
+    }
   };
 
   this.advanceByOne = function(id) {
