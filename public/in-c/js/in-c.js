@@ -573,6 +573,30 @@ function inC () {
     }
   ];
 
+  var performerMock = {
+    "adrienne" : {
+      "advancePhrase" : 0,
+      "channel" : 3,
+      "currentPhrase" : 11,
+      "instrumentName" : "viola",
+      "nextPhraseStart" : 532
+    },
+    "four" : {
+      "advancePhrase" : 1,
+      "channel" : 1,
+      "currentPhrase" : 8,
+      "instrumentName" : "acoustic_grand_piano",
+      "nextPhraseStart" : 560
+    },
+    "three" : {
+      "advancePhrase" : 9,
+      "channel" : 4,
+      "currentPhrase" : 13,
+      "instrumentName" : "marimba",
+      "nextPhraseStart" : 550
+    }
+  };
+
   this.tempo = 220;
   firebase.database().ref("inC/tempo").set(this.tempo);
   this.performers = {};
