@@ -221,7 +221,7 @@ function inC () {
         {"pitch": "Gb4", "velocity": "85", "duration": 3},
         {"pitch": "G4", "velocity": "85", "duration": 3},
         {"pitch": "A4", "velocity": "85", "duration": 3},
-        {"pitch": "B4", "velocty": "50", "duration": 1}
+        {"pitch": "B4", "velocity": "50", "duration": 1}
       ]
     },
     {
