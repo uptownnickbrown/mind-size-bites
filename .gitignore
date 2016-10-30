@@ -2,3 +2,7 @@ node_modules/
 in-c-teropa/
 **/bundle.js
 public/in-c/audio/
+
+public/in-c/.firebaserc
+
+public/in-c/404.html
