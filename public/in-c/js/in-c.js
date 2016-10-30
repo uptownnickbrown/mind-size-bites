@@ -598,11 +598,44 @@ function inC () {
   };
 
   this.tempo = 240;
-  firebase.database().ref("inC/tempo").set(this.tempo);
   this.performers = {};
-  firebase.database().ref("inC/performers").set(this.performers);
   this.availableChannel = 1;
-  firebase.database().ref("inC/availableChannel").set(this.availableChannel);
+
+  var self = this;
+  firebase.database().ref("inC").once('value',function(snapshot) {
+    var inC = snapshot.val();
+    var session = inC.session;
+    if (session) {
+      self.tempo = inC.tempo;
+      self.availableChannel = inC.availableChannel;
+      self.performers = inC.performers;
+      var syncOnPerformerKey = Object.keys(self.performers).reduce(function(a, b){ return self.performers[a]['nextPhraseStart'] > self.performers[b]['nextPhraseStart'] ? b : a });
+      var normalizeToBeatNumber = self.performers[syncOnPerformerKey]['nextPhraseStart'];
+      Object.keys(self.performers).forEach(function(performerId) {
+        var performer = self.performers[performerId];
+        self.performers[performerId]['nextPhraseStart'] = performer['nextPhraseStart'] - normalizeToBeatNumber + 4;
+        self.setupPerformer(performerId);
+        MIDI.setVolume(performer.channel, 100);
+        MIDI.programChange(performer.channel, MIDI.GM.byName[performer.instrumentName].number);
+      });
+    }
+  });
+
+  firebase.database().ref("inC").on('child_changed',function(snapshot) {
+    var key = snapshot.key;
+    if (key == 'performers') {
+      var remotePerformers = snapshot.val();
+      Object.keys(self.performers).forEach(function(performerId) {
+        if (remotePerformers[performerId]['advancePhrase'] > self.performers[performerId]['advancePhrase']) {
+          console.log('remote wants to advance: ');
+          console.log(remotePerformers[performerId]);
+          console.log('local is: ');
+          console.log(self.performers[performerId]);
+          self.advancePerformer(performerId);
+        }
+      });
+    }
+  });
 
   this.newPerformer = function(id,instrument) {
     this.performers[id] = {
@@ -634,6 +667,16 @@ function inC () {
     firebase.database().ref("inC/performers").set(this.performers);
   };
 
+  this.progressPerformer = function(id) {
+    self.performers[id].currentPhrase = self.performers[id].currentPhrase + 1;
+    self.performers[id].advancePhrase = self.performers[id].advancePhrase - 1;
+    $('#' + id + ' .current img').attr("src", "./images/" + self.performers[id].currentPhrase + ".png");
+    if (self.performers[id].currentPhrase > 53) {
+      self.removePerformer(id);
+    }
+    firebase.database().ref("inC/performers").set(this.performers);
+  };
+
   this.removePerformer = function(id) {
     delete this.performers[id];
     firebase.database().ref("inC/performers").set(this.performers);
@@ -650,17 +693,12 @@ function inC () {
 
     var metronome = setInterval(function() {
 
-      Object.keys(self.performers).forEach(function(key){
-        if (self.performers[key].nextPhraseStart == beat) {
-          if (self.performers[key].advancePhrase > 0) {
-            self.performers[key].currentPhrase = self.performers[key].currentPhrase + 1;
-            self.performers[key].advancePhrase = self.performers[key].advancePhrase - 1;
-            $('#' + key + ' .current img').attr("src", "./images/" + self.performers[key].currentPhrase + ".png");
-            if (self.performers[key].currentPhrase > 53) {
-              self.removePerformer(key);
-            }
+      Object.keys(self.performers).forEach(function(id){
+        if (self.performers[id].nextPhraseStart == beat) {
+          if (self.performers[id].advancePhrase > 0) {
+            self.progressPerformer(id);
           }
-          var scoreIndex = (self.performers[key].currentPhrase - 1);
+          var scoreIndex = (self.performers[id].currentPhrase - 1);
           var phraseScore = self.score[scoreIndex].score;
           var phraseInstructions = [];
           var phraseDuration = 0;
@@ -674,7 +712,7 @@ function inC () {
               var pitchValue = MIDI.keyToNote[note.pitch];
               var noteOn = {
                 "type": "on",
-                "channel": self.performers[key].channel,
+                "channel": self.performers[id].channel,
                 "pitch": pitchValue,
                 "velocity": velocity,
                 "duration": duration,
@@ -685,7 +723,7 @@ function inC () {
 
               var noteOff = {
                 "type":"off",
-                "channel":self.performers[key].channel,
+                "channel":self.performers[id].channel,
                 "pitch":pitchValue,
                 "duration": duration,
                 "targetBeat": phraseDuration * 2,
@@ -695,7 +733,7 @@ function inC () {
             }
             phraseDuration += duration;
           });
-          self.performers[key].nextPhraseStart = beat + phraseDuration * 2;
+          self.performers[id].nextPhraseStart = beat + phraseDuration * 2;
           phraseInstructions.forEach(function(instruction) {
             if (instruction.type == "on") {
               MIDI.noteOn(instruction.channel, instruction.pitch, instruction.velocity, instruction.delay);
@@ -713,7 +751,7 @@ function inC () {
     }, eighthNoteMilliseconds / 2);
   }
 
-  var self = this;
+
   $('.start').click(function(e){
     e.preventDefault();
     self.init();
@@ -733,20 +771,7 @@ function inC () {
     self.newPerformer(randName,randInst);
   });
 
-  $('.sync').click(function(e){
-    e.preventDefault();
-    self.performers = self.performerMock;
-    var syncOnPerformerKey = Object.keys(self.performers).reduce(function(a, b){ return self.performers[a]['nextPhraseStart'] > self.performers[b]['nextPhraseStart'] ? b : a });
-    var normalizeToBeatNumber = self.performers[syncOnPerformerKey]['nextPhraseStart'];
-    Object.keys(self.performers).forEach(function(performerId) {
-      var performer = self.performers[performerId];
-      self.performers[performerId]['nextPhraseStart'] = performer['nextPhraseStart'] - normalizeToBeatNumber + 4;
-      self.setupPerformer(performerId);
-      MIDI.setVolume(performer.channel, 100);
-      MIDI.programChange(performer.channel, MIDI.GM.byName[performer.instrumentName].number);
-    });
-    firebase.database().ref("inC/performers").set(self.performers);
-  });
+
 
 };
 
