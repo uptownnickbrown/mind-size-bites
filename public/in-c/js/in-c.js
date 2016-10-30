@@ -575,21 +575,21 @@ function inC () {
 
   this.performerMock = {
     "6ac5816b-d392-bf0f-7b14-8469da9ff2c5" : {
-      "advancePhrase" : 0,
+      "advanceToPhrase" : 11,
       "channel" : 3,
       "currentPhrase" : 11,
       "instrumentName" : "viola",
       "nextPhraseStart" : 532
     },
     "b78de98e-0931-f1b7-7671-13874d030371" : {
-      "advancePhrase" : 1,
+      "advanceToPhrase" : 8,
       "channel" : 1,
       "currentPhrase" : 8,
       "instrumentName" : "acoustic_grand_piano",
       "nextPhraseStart" : 560
     },
     "e875f60e-cc39-3a6c-e306-f0d1f6ccde57" : {
-      "advancePhrase" : 9,
+      "advanceToPhrase" : 10,
       "channel" : 4,
       "currentPhrase" : 10,
       "instrumentName" : "marimba",
@@ -626,12 +626,8 @@ function inC () {
     if (key == 'performers') {
       var remotePerformers = snapshot.val();
       Object.keys(self.performers).forEach(function(performerId) {
-        if (remotePerformers[performerId]['advancePhrase'] > self.performers[performerId]['advancePhrase']) {
-          console.log('remote wants to advance: ');
-          console.log(remotePerformers[performerId]);
-          console.log('local is: ');
-          console.log(self.performers[performerId]);
-          self.advancePerformer(performerId);
+        if (remotePerformers[performerId]['advanceToPhrase'] > self.performers[performerId]['currentPhrase'] && remotePerformers[performerId]['advanceToPhrase'] > self.performers[performerId]['advanceToPhrase']) {
+          self.advanceToPhrase(performerId,remotePerformers[performerId]['advanceToPhrase']);
         }
       });
     }
@@ -643,7 +639,7 @@ function inC () {
       "instrumentName":instrument,
       "currentPhrase":1,
       "nextPhraseStart":4,
-      "advancePhrase":0
+      "advanceToPhrase":1
     };
     // Set up performer audio Channel
     MIDI.setVolume(this.availableChannel, 100);
@@ -658,18 +654,22 @@ function inC () {
     $('.performers').append('<div class="player" id="' + id + '"><button class="advance">Advance</button><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div></div>');
     $('#' + id + ' .advance').click(function(e){
       e.preventDefault();
-      self.advancePerformer(id);
+      self.advanceByOne(id);
     });
   };
 
-  this.advancePerformer = function(id) {
-    this.performers[id].advancePhrase += 1;
+  this.advanceByOne = function(id) {
+    this.performers[id].advanceToPhrase += 1;
+    firebase.database().ref("inC/performers").set(this.performers);
+  };
+
+  this.advanceToPhrase = function(id,phrase) {
+    this.performers[id].advanceToPhrase = phrase;
     firebase.database().ref("inC/performers").set(this.performers);
   };
 
   this.progressPerformer = function(id) {
     self.performers[id].currentPhrase = self.performers[id].currentPhrase + 1;
-    self.performers[id].advancePhrase = self.performers[id].advancePhrase - 1;
     $('#' + id + ' .current img').attr("src", "./images/" + self.performers[id].currentPhrase + ".png");
     if (self.performers[id].currentPhrase > 53) {
       self.removePerformer(id);
@@ -679,6 +679,11 @@ function inC () {
 
   this.removePerformer = function(id) {
     delete this.performers[id];
+    $('#' + id + ' .advance').remove();
+    $('#' + id + ' .current img').attr("src", "./images/shh.jpg");
+    if (this.performers.length == 0) {
+      firebase.database().ref("inC/session").set(0);
+    }
     firebase.database().ref("inC/performers").set(this.performers);
   };
 
@@ -695,7 +700,7 @@ function inC () {
 
       Object.keys(self.performers).forEach(function(id){
         if (self.performers[id].nextPhraseStart == beat) {
-          if (self.performers[id].advancePhrase > 0) {
+          if (self.performers[id].advanceToPhrase > self.performers[id].currentPhrase) {
             self.progressPerformer(id);
           }
           var scoreIndex = (self.performers[id].currentPhrase - 1);
