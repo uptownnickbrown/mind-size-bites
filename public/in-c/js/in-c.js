@@ -573,38 +573,38 @@ function inC () {
     }
   ];
 
-  var performerMock = {
-    "adrienne" : {
+  this.performerMock = {
+    "6ac5816b-d392-bf0f-7b14-8469da9ff2c5" : {
       "advancePhrase" : 0,
       "channel" : 3,
       "currentPhrase" : 11,
       "instrumentName" : "viola",
       "nextPhraseStart" : 532
     },
-    "four" : {
+    "b78de98e-0931-f1b7-7671-13874d030371" : {
       "advancePhrase" : 1,
       "channel" : 1,
       "currentPhrase" : 8,
       "instrumentName" : "acoustic_grand_piano",
       "nextPhraseStart" : 560
     },
-    "three" : {
+    "e875f60e-cc39-3a6c-e306-f0d1f6ccde57" : {
       "advancePhrase" : 9,
       "channel" : 4,
-      "currentPhrase" : 13,
+      "currentPhrase" : 10,
       "instrumentName" : "marimba",
       "nextPhraseStart" : 550
     }
   };
 
-  this.tempo = 220;
+  this.tempo = 240;
   firebase.database().ref("inC/tempo").set(this.tempo);
   this.performers = {};
   firebase.database().ref("inC/performers").set(this.performers);
   this.availableChannel = 1;
   firebase.database().ref("inC/availableChannel").set(this.availableChannel);
 
-  this.addPerformer = function(id,instrument) {
+  this.newPerformer = function(id,instrument) {
     this.performers[id] = {
       "channel":this.availableChannel,
       "instrumentName":instrument,
@@ -616,8 +616,17 @@ function inC () {
     MIDI.setVolume(this.availableChannel, 100);
     MIDI.programChange(this.availableChannel, MIDI.GM.byName[instrument].number);
     this.availableChannel += 1;
-    firebase.database().ref("inC/performers").set(this.performers);
     firebase.database().ref("inC/availableChannel").set(this.availableChannel);
+    firebase.database().ref("inC/performers").set(this.performers);
+    this.setupPerformer(id);
+  }
+
+  this.setupPerformer = function(id) {
+    $('.performers').append('<div class="player" id="' + id + '"><button class="advance">Advance</button><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div></div>');
+    $('#' + id + ' .advance').click(function(e){
+      e.preventDefault();
+      self.advancePerformer(id);
+    });
   };
 
   this.advancePerformer = function(id) {
@@ -712,27 +721,41 @@ function inC () {
 
   $('.add').click(function(e){
     e.preventDefault();
-    var names = ["nick","adrienne","three","four"];
     var insts = ["acoustic_grand_piano","marimba","oboe","viola"];
-
-    var randName = names[Math.floor(Math.random()*names.length)];
     var randInst = insts[Math.floor(Math.random()*insts.length)]
-
-    self.addPerformer(randName,randInst);
-    $('.performers').append('<div class="player" id="' + randName + '"><button class="advance">Advance</button><div class="current"><img src="./images/1.png" /></div></div>');
-    $('#' + randName + ' .advance').click(function(e){
-      e.preventDefault();
-      self.advancePerformer(randName);
-    });
+    function s4() {
+      return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+    }
+    var randName = s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+      s4() + '-' + s4() + s4() + s4();
+    self.newPerformer(randName,randInst);
   });
+
+  $('.sync').click(function(e){
+    e.preventDefault();
+    self.performers = self.performerMock;
+    var syncOnPerformerKey = Object.keys(self.performers).reduce(function(a, b){ return self.performers[a]['nextPhraseStart'] > self.performers[b]['nextPhraseStart'] ? b : a });
+    var normalizeToBeatNumber = self.performers[syncOnPerformerKey]['nextPhraseStart'];
+    Object.keys(self.performers).forEach(function(performerId) {
+      var performer = self.performers[performerId];
+      self.performers[performerId]['nextPhraseStart'] = performer['nextPhraseStart'] - normalizeToBeatNumber + 4;
+      self.setupPerformer(performerId);
+      MIDI.setVolume(performer.channel, 100);
+      MIDI.programChange(performer.channel, MIDI.GM.byName[performer.instrumentName].number);
+    });
+    firebase.database().ref("inC/performers").set(self.performers);
+  });
+
 };
 
 $(document).ready(function() {
-  	MIDI.loadPlugin({
-  		soundfontUrl: "./audio/",
-  		instruments: [ "acoustic_grand_piano", "oboe", "viola", "marimba"],
-  		onsuccess: function() {
-        window.inC = new inC();
-  		}
-  	});
+	MIDI.loadPlugin({
+		soundfontUrl: "./audio/",
+		instruments: [ "acoustic_grand_piano", "oboe", "viola", "marimba"],
+		onsuccess: function() {
+      window.inC = new inC();
+		}
+	});
 });
