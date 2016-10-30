@@ -653,8 +653,10 @@ function inC () {
   this.newPerformer = function(id,instrument) {
     // If someone is already playing, find out what beat # they're on and join in then.
     var normalizeToBeatNumber;
-    if (self.performers.length > 0) {
-      var syncOnPerformerKey = Object.keys(self.performers).reduce(function(a, b){ return self.performers[a]['nextPhraseStart'] > self.performers[b]['nextPhraseStart'] ? b : a });
+    if (Object.keys(self.performers).length > 0) {
+      var syncOnPerformerKey = Object.keys(self.performers).reduce(function(a, b){
+        return self.performers[a]['nextPhraseStart'] > self.performers[b]['nextPhraseStart'] ? b : a
+      });
       normalizeToBeatNumber = self.performers[syncOnPerformerKey]['nextPhraseStart'];
     } else {
       normalizeToBeatNumber = 4;
