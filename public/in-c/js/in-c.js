@@ -622,9 +622,7 @@ function inC () {
           if (self.performers[key].advancePhrase > 0) {
             self.performers[key].currentPhrase = self.performers[key].currentPhrase + 1;
             self.performers[key].advancePhrase = self.performers[key].advancePhrase - 1;
-            $('.current.' + key + ' span').html(self.performers[key].currentPhrase);
-            $('.current.' + key + '  img').attr("src", "./images/" + self.performers[key].currentPhrase + ".png");
-            $('.expected.' + key).html(self.performers[key].advancePhrase);
+            $('#' + key + ' .current img').attr("src", "./images/" + self.performers[key].currentPhrase + ".png");
             if (self.performers[key].currentPhrase > 53) {
               self.removePerformer(key);
             }
@@ -679,47 +677,30 @@ function inC () {
         MIDI.noteOff(0, 72, 0.25);
       }
       beat += 1;
-      // randomize phrase progression
-      //if (beat % (Math.floor(Math.random() * 16) + 23) == 0) {
-      //  self.phraseCounter += 1;
-      //}
-
     }, eighthNoteMilliseconds / 2);
   }
 
   var self = this;
   $('.start').click(function(e){
     e.preventDefault();
-    self.addPerformer("nick","acoustic_grand_piano");
-    self.addPerformer("adrienne","marimba");
-    self.addPerformer("three","oboe");
-    self.addPerformer("four","viola");
     self.init();
   });
 
-  $('.advance.nick').click(function(e){
+  $('.add').click(function(e){
     e.preventDefault();
-    self.advancePerformer("nick");
-    $('.expected.nick').html(self.performers["nick"].advancePhrase);
-  });
+    var names = ["nick","adrienne","three","four"];
+    var insts = ["acoustic_grand_piano","marimba","oboe","viola"];
 
-  $('.advance.adrienne').click(function(e){
-    e.preventDefault();
-    self.advancePerformer("adrienne");
-    $('.expected.adrienne').html(self.performers["adrienne"].advancePhrase);
-  });
-  $('.advance.three').click(function(e){
-    e.preventDefault();
-    self.advancePerformer("three");
-    $('.expected.three').html(self.performers["three"].advancePhrase);
-  });
-  $('.advance.four').click(function(e){
-    e.preventDefault();
-    self.advancePerformer("four");
-    $('.expected.four').html(self.performers["four"].advancePhrase);
-  });
+    var randName = names[Math.floor(Math.random()*names.length)];
+    var randInst = insts[Math.floor(Math.random()*insts.length)]
 
-
+    self.addPerformer(randName,randInst);
+    $('.performers').append('<div class="player" id="' + randName + '"><button class="advance">Advance</button><div class="current"><img src="./images/1.png" /></div></div>');
+    $('#' + randName + ' .advance').click(function(e){
+      e.preventDefault();
+      self.advancePerformer(randName);
+    });
+  });
 };
 
 $(document).ready(function() {

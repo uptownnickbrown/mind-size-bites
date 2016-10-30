@@ -12,37 +12,36 @@ h2 {
 
 .start {
   display:block;
-  width:80%;
+  width:30%;
+  float:left;
+  margin-left:15%;
   height:40px;
+  margin-bottom:50px;
+}
+.add {
+  margin-bottom:50px;
+  width:30%;
+  float:right;
+  display:block;
+  height:40px;
+  margin-right:15%;
+}
+
+.performers {
+  clear:both;
+  margin-top:80px;
+}
+
+.player {
+  width:100%;
+  display:block;
   margin: 25px auto;
-}
-
-.player.nick {
-  clear:both;
-  float:left;
-  width:45%;
-  text-align:center
-}
-.player.adrienne {
-  float:right;
-  width:45%;
-  text-align:center
-}
-
-.player.three {
-  clear:both;
-  float:left;
-  width:45%;
-  text-align:center
-}
-.player.four {
-  float:right;
-  width:45%;
   text-align:center
 }
 
 img {
   height:200px;
   margin:20px auto;
+  text-align:center;
   display:block;
 }
