@@ -574,26 +574,40 @@ function inC () {
   ];
 
   this.performerMock = {
-    "6ac5816b-d392-bf0f-7b14-8469da9ff2c5" : {
-      "advanceToPhrase" : 11,
-      "channel" : 3,
-      "currentPhrase" : 11,
-      "instrumentName" : "viola",
-      "nextPhraseStart" : 532
-    },
-    "b78de98e-0931-f1b7-7671-13874d030371" : {
-      "advanceToPhrase" : 8,
-      "channel" : 1,
-      "currentPhrase" : 8,
-      "instrumentName" : "acoustic_grand_piano",
-      "nextPhraseStart" : 560
-    },
-    "e875f60e-cc39-3a6c-e306-f0d1f6ccde57" : {
-      "advanceToPhrase" : 10,
-      "channel" : 4,
-      "currentPhrase" : 10,
+    "461c9669-ef45-33e1-0b7b-a8bd7b6d7eee" : {
+      "advanceToPhrase" : 9,
+      "channel" : 2,
+      "currentPhrase" : 9,
       "instrumentName" : "marimba",
-      "nextPhraseStart" : 550
+      "nextPhraseStart" : 38
+    },
+    "b6df1e27-13ab-81dd-4a0f-142cc6e50bb4" : {
+      "advanceToPhrase" : 7,
+      "channel" : 3,
+      "currentPhrase" : 7,
+      "instrumentName" : "acoustic_grand_piano",
+      "nextPhraseStart" : 32
+    },
+    "bdf9757b-840c-2f75-be99-738338c75031" : {
+      "advanceToPhrase" : 5,
+      "channel" : 4,
+      "currentPhrase" : 5,
+      "instrumentName" : "marimba",
+      "nextPhraseStart" : 6
+    },
+    "dcc67053-16f8-936d-a999-d2a1aa37fe4d" : {
+      "advanceToPhrase" : 4,
+      "channel" : 5,
+      "currentPhrase" : 4,
+      "instrumentName" : "oboe",
+      "nextPhraseStart" : 10
+    },
+    "deb656fd-670b-b947-db16-aacdb5ef3201" : {
+      "advanceToPhrase" : 9,
+      "channel" : 1,
+      "currentPhrase" : 9,
+      "instrumentName" : "viola",
+      "nextPhraseStart" : 4
     }
   };
 
