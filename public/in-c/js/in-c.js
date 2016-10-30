@@ -613,7 +613,7 @@ function inC () {
       var normalizeToBeatNumber = self.performers[syncOnPerformerKey]['nextPhraseStart'];
       Object.keys(self.performers).forEach(function(performerId) {
         var performer = self.performers[performerId];
-        self.performers[performerId]['nextPhraseStart'] = performer['nextPhraseStart'] - normalizeToBeatNumber + 4;
+        self.performers[performerId]['nextPhraseStart'] = performer['nextPhraseStart'] - (normalizeToBeatNumber - 4);
         self.setupPerformer(performerId);
         MIDI.setVolume(performer.channel, 100);
         MIDI.programChange(performer.channel, MIDI.GM.byName[performer.instrumentName].number);
@@ -634,11 +634,20 @@ function inC () {
   });
 
   this.newPerformer = function(id,instrument) {
+    // If someone is already playing, find out what beat # they're on and join in then.
+    var normalizeToBeatNumber;
+    if (self.performers.length > 0) {
+      var syncOnPerformerKey = Object.keys(self.performers).reduce(function(a, b){ return self.performers[a]['nextPhraseStart'] > self.performers[b]['nextPhraseStart'] ? b : a });
+      normalizeToBeatNumber = self.performers[syncOnPerformerKey]['nextPhraseStart'];
+    } else {
+      normalizeToBeatNumber = 4;
+    }
+    // otherwise start after a few metronome ticks
     this.performers[id] = {
       "channel":this.availableChannel,
       "instrumentName":instrument,
       "currentPhrase":1,
-      "nextPhraseStart":4,
+      "nextPhraseStart":normalizeToBeatNumber,
       "advanceToPhrase":1
     };
     // Set up performer audio Channel
