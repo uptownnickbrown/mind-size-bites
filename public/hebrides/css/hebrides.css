@@ -37,7 +37,7 @@ h4 {
   margin-bottom:0;
 }
 
-p,li {
+p,li,label {
   font-size: .875em;
 }
 
@@ -69,6 +69,12 @@ p,li {
 .audio-controls {
   margin: 10px auto;
   text-align: center;
+}
+
+.tap-controls {
+  margin: 10px auto;
+  display:block;
+  text-align:center;
 }
 
 button {
@@ -130,4 +136,28 @@ button {
   display:block;
   margin:10px auto;
   width:660px;
+}
+
+#bpm {
+  font-weight:700;
+}
+
+a {
+  color: rgb(0, 127, 173);
+  text-decoration: none;
+}
+
+input[type=checkbox] {
+  transform: scale(1.5);
+  padding: 10px;
+  margin-right: 6px;
+}
+
+/* baton styles */
+
+.conductaire {
+  margin:0px auto;
+  text-align:center;
+  display:block;
+  width:80%;
 }
