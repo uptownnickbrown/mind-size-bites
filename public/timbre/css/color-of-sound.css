@@ -112,3 +112,9 @@ a {
 .audio-volume {
   display:none;
 }
+
+.embed {
+  margin-top:15px;
+  width:92%;
+  height:520px;
+}

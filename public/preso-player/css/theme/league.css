@@ -1,15 +1,3 @@
-/**
- * League theme for reveal.js.
- *
- * This was the default theme pre-3.0.0.
- *
- * Copyright (C) 2011-2012 Hakim El Hattab, http://hakim.se
- */
-@import url(../../lib/font/league-gothic/league-gothic.css);
-@import url(https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic);
-/*********************************************
- * GLOBAL STYLES
- *********************************************/
 body {
   background: #1c1e20;
   background: -moz-radial-gradient(center, circle cover, #555a5f 0%, #1c1e20 100%);
@@ -40,9 +28,7 @@ body {
  * HEADERS
  *********************************************/
 .reveal h1,
-.reveal h2,
 .reveal h3,
-.reveal h4,
 .reveal h5,
 .reveal h6 {
   margin: 0 0 20px 0;
@@ -236,8 +222,17 @@ body {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); }
 
 .reveal section img.plain {
+
   border: 0;
   box-shadow: none; }
+
+.reveal .explosion {
+  margin: 25px 0px;
+  height:300px;
+  background: none;
+  border: 0;
+  box-shadow: none;
+ }
 
 .reveal a img {
   -webkit-transition: all .15s linear;
