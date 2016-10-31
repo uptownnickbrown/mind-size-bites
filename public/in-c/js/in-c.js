@@ -797,7 +797,7 @@ function inC () {
 
   $('.add').click(function(e){
     e.preventDefault();
-    var insts = ["acoustic_grand_piano","marimba","oboe","viola"];
+    var insts = ["marimba"];
     var randInst = insts[Math.floor(Math.random()*insts.length)]
     function s4() {
       return Math.floor((1 + Math.random()) * 0x10000)
