@@ -4,8 +4,10 @@ $(document).ready(function() {
 
   // Make all the audio nodes we need
   // Connect to the <audio> element with the trumpet file in it
-  var audioElement = document.getElementById('audioElement');
-  var audioFile = audioCtx.createMediaElementSource(audioElement);
+  var trumpetAudioElement = document.getElementById('trumpet');
+  var fluteAudioElement = document.getElementById('flute');
+  var trumpetAudioFile = audioCtx.createMediaElementSource(trumpetAudioElement);
+  var fluteAudioFile = audioCtx.createMediaElementSource(fluteAudioElement);
 
   // Analysis node
   var analyser = audioCtx.createAnalyser(); // this spelling annoys me, but let's be consistent with the API
@@ -36,7 +38,7 @@ $(document).ready(function() {
                         |
                     gainNode
                    /        \
-        oscillatorGain       audioFile
+        oscillatorGain       trumpetAudioFile and fluteAudioFile
             /
     oscillator
   */
@@ -44,7 +46,8 @@ $(document).ready(function() {
   // This is super annoying.
   // Anyway, oscillator creation (and connection up to this node graph) moved down to the play/pause logic
 
-  audioFile.connect(gainNode);
+  trumpetAudioFile.connect(gainNode);
+  fluteAudioFile.connect(gainNode);
   oscillatorGain.connect(gainNode);
   gainNode.connect(analyser);
   gainNode.connect(audioCtx.destination);
@@ -54,11 +57,11 @@ $(document).ready(function() {
   // TODO remove hard-coded value (for a Bb)
   var numSamplesPerWave = bufferLength / (466.164 / ((audioCtx.sampleRate / bufferLength)));
   // Get 4 waves worth of data at a time
-  var timeDomainData = new Uint8Array(numSamplesPerWave * 4);
+  var timeDomainData = new Uint8Array(numSamplesPerWave * 8);
   // 2.5 truncates the frequency range, because very high frequencies aren't needed
   // Without 2.5, it will go up to the Nyquist frequency, which is half the sample rate
   // and is the theoretical limit above which FFT transformed data isn't available
-  var frequencyData = new Uint8Array(analyser.frequencyBinCount / 10);
+  var frequencyData = new Uint8Array(analyser.frequencyBinCount / 8);
 
   // Draw the waveform for the currently playing audio!
 
@@ -69,6 +72,18 @@ $(document).ready(function() {
   var HEIGHT = canvas.height;
   canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
 
+  // Base waveform styles
+  canvasCtx.fillStyle = 'rgb(230, 230, 230)';
+  canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+
+  // draw a mid-line
+  canvasCtx.lineWidth = 2;
+  canvasCtx.beginPath();
+  canvasCtx.moveTo(0, canvas.height / 2);
+  canvasCtx.lineTo(canvas.width, canvas.height / 2);
+  canvasCtx.strokeStyle = 'rgb(0, 128, 173)';
+  canvasCtx.stroke();
+  canvasCtx.closePath();
 
   function drawWaveform() {
     // using requestAnimationFrame here means we won't redraw until the browser is ready
@@ -79,59 +94,18 @@ $(document).ready(function() {
     // Accepts a Uint8Array of "the right length" which is analyser.frequencyBinCount
     // If the array is too short, all extra values are dropped on the floor
     analyser.getByteTimeDomainData(timeDomainData);
-
     // Base waveform styles
     canvasCtx.fillStyle = 'rgb(230, 230, 230)';
     canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
-
-    // draw a mid-line
     canvasCtx.lineWidth = 2;
-    canvasCtx.beginPath();
-    canvasCtx.moveTo(0, canvas.height / 2);
-    canvasCtx.lineTo(canvas.width, canvas.height / 2);
-    canvasCtx.strokeStyle = 'rgb(90, 90, 90)';
-    canvasCtx.stroke();
-    canvasCtx.closePath();
-
-    // Used to draw vertical lines at certain points in the waveform
-    var addVertLine = function(x) {
-      canvasCtx.beginPath();
-      canvasCtx.lineWidth = 1;
-      canvasCtx.moveTo(x, 0);
-      canvasCtx.lineTo(x, canvas.height);
-      canvasCtx.strokeStyle = 'rgb(255, 0, 255)';
-      canvasCtx.stroke();
-      canvasCtx.closePath();
-    }
-
-    // Get the minimum value in an arr
-    var indexOfMin = function(arr,limit) {
-        if (arr.length === 0) {
-            return -1;
-        }
-        var min = arr[0];
-        var minIndex = 0;
-        for (var i = 1; i < limit; i++) {
-            if (arr[i] < min) {
-                minIndex = i;
-                min = arr[i];
-            }
-        }
-        return minIndex;
-    }
-
-    // Get the minimum value in the first "wave's worth" of the current buffer - we're going to start our wave drawing there
-    var minIndex = indexOfMin(timeDomainData,numSamplesPerWave);
-
-    canvasCtx.lineWidth = 4;
-    canvasCtx.strokeStyle = 'rgb(30, 30, 30)';
+    canvasCtx.strokeStyle = 'rgb(0, 128, 173)';
 
     // Start drawing
     canvasCtx.beginPath();
 
-    var sliceWidth = WIDTH / numSamplesPerWave;
+    var sliceWidth = WIDTH / (numSamplesPerWave * 8);
     var x = 0;
-    for (var i = minIndex; i < (minIndex + numSamplesPerWave + 1); i++) {
+    for (var i = 0; i < timeDomainData.length; i++) {
       var y = (timeDomainData[i] * 2 * HEIGHT / 256.0) - (HEIGHT / 2);
       if (i === 0) {
         canvasCtx.moveTo(0, y);
@@ -147,11 +121,11 @@ $(document).ready(function() {
 
   // Draw the frequency analysis for the currently playing audio!
   // Frequency chart settings
-  var svgHeight = 285;
-  var svgWidth = 1024;
+  var svgHeight = 240;
+  var svgWidth = 868;
   var barPadding = 0;
 
-  var svg = d3.select('#graph')
+  var svg = d3.select('.graph')
     .append('svg')
     .attr('height', svgHeight)
     .attr('width', svgWidth);
@@ -173,7 +147,9 @@ $(document).ready(function() {
            .attr("x", function(d, i) {
              return i * (svgWidth / frequencyData.length);
            })
-           .attr("y", 285)
+           .attr("y", 236)
+           .attr("color", "#444")
+           .attr("font-size", ".875em")
            .attr("dy", "0")
            .attr("text-anchor","middle")
            .text(function(d,i) {
@@ -194,13 +170,13 @@ $(document).ready(function() {
     frequencyRects
       .data(frequencyData)
       .attr('y', function(d) {
-        return svgHeight - 15 - d;
+        return svgHeight - 16 - (d * .85);
       })
       .attr('height', function(d) {
-        return d;
+        return d * .85;
       })
       .attr('fill', function(d) {
-        return '#666';
+        return '#007fad';
       });
   }
 
@@ -226,7 +202,10 @@ $(document).ready(function() {
   function play(audiotype) {
     stop();
     if (audiotype == 'trumpet') {
-      $('#audioElement')[0].play();
+      $('#trumpet')[0].play();
+      audioOn = 1;
+    } else if (audiotype == 'flute') {
+      $('#flute')[0].play();
       audioOn = 1;
     } else {
       var createOscillatorOrWait = function() {
@@ -252,8 +231,10 @@ $(document).ready(function() {
   function stop() {
     // Stop any currently playing audio
     if (audioOn) {
-      $('#audioElement')[0].pause();
-      $('#audioElement')[0].currentTime = 0;
+      $('#trumpet')[0].pause();
+      $('#flute')[0].pause();
+      $('#trumpet')[0].currentTime = 0;
+      $('#flute')[0].currentTime = 0;
       audioOn = 0;
     }
     if (oscillatorOn) {
