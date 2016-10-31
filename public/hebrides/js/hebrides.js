@@ -18,7 +18,43 @@ $(document).ready(function() {
     var audioMonitor,
         videoMonitor,
         conductingMonitor,
-        playhead = 33;
+        playhead = 32;
+
+    var scoreMap = {
+      34: 3,
+      44: 4,
+      55: 5,
+      63: 6,
+      70: 7,
+      77: 8,
+      85: 9,
+      95: 10,
+      107: 11,
+      119: 12,
+      127: 13,
+      134: 14,
+      141: 15,
+      147: 16,
+      153: 17,
+      159: 18,
+      166: 19,
+      172: 20,
+      178: 21,
+      186: 22,
+      192: 23
+    };
+
+    function movePlayhead(playhead) {
+      playhead = Math.round(playhead);
+      $('#timer').text(playhead);
+      if (scoreMap[playhead]) {
+        if (pageNum != scoreMap[playhead] && renderRequestPending == false) {
+          console.log('queuing a render for page ' + scoreMap[playhead]);
+          renderRequestPending = true;
+          queueRenderPage(scoreMap[playhead]);
+        }
+      }
+    };
 
     function onPlayerReady(event) {
       $('#play-video').click(function() {
@@ -32,8 +68,8 @@ $(document).ready(function() {
 
         videoMonitor = setInterval(function () {
           playhead = event.target.getCurrentTime();
-          $('#timer').text(Math.round(playhead));
-        }, 166);
+          movePlayhead(playhead);
+        }, 500);
       });
     }
 
@@ -49,6 +85,7 @@ $(document).ready(function() {
 
 
     $('.play-audio').click(function() {
+      console.log('setting up audio timer');
       youtubePlayer.pauseVideo();
       clearInterval(videoMonitor);
       clearInterval(conductingMonitor);
@@ -57,8 +94,8 @@ $(document).ready(function() {
       $('#audio-player')[0].play();
       audioMonitor = setInterval(function () {
         playhead = $('#audio-player')[0].currentTime;
-        $('#timer').text(Math.round(playhead));
-      }, 166);
+        movePlayhead(playhead);
+      }, 500);
     });
 
     $('#stop').click(function() {
@@ -123,8 +160,8 @@ $(document).ready(function() {
 
       conductingMonitor = setInterval(function () {
         playhead = $('#audio-player')[0].currentTime;
-        $('#timer').text(Math.round(playhead));
-      }, 166);
+        movePlayhead(playhead);
+      }, 250);
     };
 
     var updateTempo = function(tempo) {
@@ -169,12 +206,12 @@ $(document).ready(function() {
     });
 
     var scoreURL = './images/full-score.pdf';
-    PDFJS.disableWorker = true;
     var pdfDoc = null,
-      pageNum = 3,
+      pageNum = 1,
       pageRendering = false,
+      renderRequestPending = false,
       pageNumPending = null,
-      scale = 1.6,
+      scale = 1.4,
       canvas = document.getElementById('score-canvas'),
       ctx = canvas.getContext('2d');
 
@@ -191,6 +228,7 @@ $(document).ready(function() {
         var renderTask = page.render(renderContext);
         renderTask.promise.then(function () {
           pageRendering = false;
+          renderRequestPending = false;
           if (pageNumPending !== null) {
             renderPage(pageNumPending);
             pageNumPending = null;
