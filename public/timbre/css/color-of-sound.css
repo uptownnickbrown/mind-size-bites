@@ -57,12 +57,14 @@ p,li,label {
   display:block;
 }
 
-.timer {
-  display:none;
-}
-
 .timbre-controls {
   margin: 10px auto;
+  display:block;
+  text-align:center;
+}
+
+.visualization-controls {
+  margin: 10px auto 15px;
   display:block;
   text-align:center;
 }
@@ -105,4 +107,8 @@ a {
   border-top-right-radius: 4px;
   border-top-left-radius: 4px;
   margin-bottom:-7px;
+}
+
+.audio-volume {
+  display:none;
 }

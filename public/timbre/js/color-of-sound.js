@@ -52,6 +52,18 @@ $(document).ready(function() {
   gainNode.connect(analyser);
   gainNode.connect(audioCtx.destination);
 
+  function setupMicrophone() {
+    navigator.getUserMedia({audio: true}, function(stream) {
+      var microphone = audioCtx.createMediaStreamSource(stream);
+      microphone.connect(analyser);
+      $('.record-stop').on('click',function(){
+        microphone.disconnect();
+      });
+    }, function() {
+      console.log('problem loading microphone');
+    });
+  }
+
   // Precreate byte arrays for bytewise timeseries / waveform and frequency data
   // Didn't know these array types existed https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array
   // TODO remove hard-coded value (for a Bb)
@@ -263,5 +275,10 @@ $(document).ready(function() {
   });
   $('.softer').on('click',function(){
     softer();
+  });
+  $('.record-audio').on('click',function(){
+    setupMicrophone();
+    drawWaveform();
+    drawFrequencyChart();
   });
 });
