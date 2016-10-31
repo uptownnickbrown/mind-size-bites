@@ -26,6 +26,7 @@ $(document).ready(function() {
         clearInterval(audioMonitor);
         clearInterval(conductingMonitor);
 
+        $('#video-player').css('display','block');
         event.target.seekTo(playhead);
         event.target.playVideo();
 
@@ -47,7 +48,7 @@ $(document).ready(function() {
       });
 
 
-    $('#play-audio').click(function() {
+    $('.play-audio').click(function() {
       youtubePlayer.pauseVideo();
       clearInterval(videoMonitor);
       clearInterval(conductingMonitor);
@@ -96,11 +97,7 @@ $(document).ready(function() {
     //   pitchShift.transpose = $('#pitch').val();
     // });
 
-    audioNode.mediaElement.playbackRate = $('#rate').val();
-    $('#rate').change(function(e) {
-      audioNode.mediaElement.playbackRate = $('#rate').val();
-    });
-
+    audioNode.mediaElement.playbackRate = 1
 
     audioNode.connect(gainNode);
     gainNode.connect(audioCtx.destination);
