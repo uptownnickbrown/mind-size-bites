@@ -101,7 +101,6 @@ text-align:center;}
 .reveal ol,
 .reveal dl,
 .reveal ul {
-  display: inline-block;
   text-align: left;
   margin: 0 0 0 1em; }
 
@@ -399,10 +398,9 @@ a {
 }
 
 .frontbullets li {
-    font-size: 24px;
-    text-align: left;
     font-family: 'Roboto', sans-serif;
     font-weight: 300;
+		font-size:1.2em;
     line-height:30px;
 
 }
@@ -445,6 +443,10 @@ a {
 
 .narrow {
 	max-width:80% !important;
+}
+
+.reveal .tiny {
+	max-width:40% !important;
 }
 
 .inset {
