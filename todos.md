@@ -1,9 +1,9 @@
 General:
 * ~~build preso wrapper (reuse MVJ preso?) - LearnKit SDK preso: http://localhost:8001/#/3~~
-* tweak layout (more real estate)
+* ~~tweak layout (more real estate)~~
 * design/layout for chapters (steal from VCS? other book?)
 * wrap it up in an EPUB 3, ingest into Bookshelf
-* Add section intro / 1st / last slides
+* ~~Add section intro / 1st / last slides~~
 
 Hebrides:
 * add boilerplate content on Mendellsohn / Hebrides
@@ -30,9 +30,8 @@ http://demos.smu.ca/index.php/demos/waves/20-sound-waves
 In C:
 * add boilerplate content on In C
 https://cnx.org/contents/hIRWxta7@1/Chapter-5--European-and-Americ
-* iframe in teropa's in C? http://teropa.info/in-c/
-* stretch goal...build the live collaborative In C across the network
-http://blog.gleitzman.com/post/63283830260/midijs-playing-audio-in-the-browser-with
+* ~~iframe in teropa's in C? http://teropa.info/in-c/~~
+* ~~stretch goal...build the live collaborative In C across the network http://blog.gleitzman.com/post/63283830260/midijs-playing-audio-in-the-browser-with~~
 
 LearnKit:
 * ~~Re-order LearnKit slides: 0 -> 4 -> 6 -> 2 -> 3~~
