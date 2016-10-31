@@ -18,7 +18,7 @@ $(document).ready(function() {
     var audioMonitor,
         videoMonitor,
         conductingMonitor,
-        playhead = 34;
+        playhead = 33;
 
     function onPlayerReady(event) {
       $('#play-video').click(function() {
@@ -128,7 +128,7 @@ $(document).ready(function() {
     };
 
     var updateTempo = function(tempo) {
-      $('#bpm').text(tempo);
+      $('#bpm').text(Math.floor(tempo));
       audioNode.mediaElement.playbackRate = tempo / initialTempo;
       firebase.database().ref("hebrides/tempo").set(tempo);
     };
