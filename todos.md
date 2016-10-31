@@ -1,18 +1,18 @@
 General:
 * ~~build preso wrapper (reuse MVJ preso?) - LearnKit SDK preso: http://localhost:8001/#/3~~
 * ~~tweak layout (more real estate)~~
-* design/layout for chapters (steal from VCS? other book?)
+* ~~design/layout for chapters (steal from VCS? other book?)~~
 * wrap it up in an EPUB 3, ingest into Bookshelf
 * ~~Add section intro / 1st / last slides~~
 
 Hebrides:
-* add boilerplate content on Mendellsohn / Hebrides
-https://en.wikipedia.org/wiki/The_Hebrides_(overture)
-* add a "reset tempo"
-* add image of the score
-* add playhead tracking to the score
-* remove unneeded pieces (vol / pitch / rate / coordinates / accel)
-* make baton web page just a picture of a baton...
+* ~~add boilerplate content on Mendellsohn / Hebrides
+https://en.wikipedia.org/wiki/The_Hebrides_(overture)~~
+* ~~add a "reset tempo"~~
+* ~~add image of the score~~
+* ~~add playhead tracking to the score~~
+* ~~remove unneeded pieces (vol / pitch / rate / coordinates / accel)~~
+* ~~make baton web page just a picture of a baton...~~
 
 Timbre:
 * add boilerplate content on Timbre - https://cnx.org/contents/8wb7KfA0@15/Timbre-The-Color-of-Music
