@@ -72,10 +72,6 @@ $(document).ready(function() {
   var HEIGHT = canvas.height;
   canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
 
-  // Base waveform styles
-  canvasCtx.fillStyle = 'rgb(230, 230, 230)';
-  canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
-
   // draw a mid-line
   canvasCtx.lineWidth = 2;
   canvasCtx.beginPath();
@@ -95,7 +91,7 @@ $(document).ready(function() {
     // If the array is too short, all extra values are dropped on the floor
     analyser.getByteTimeDomainData(timeDomainData);
     // Base waveform styles
-    canvasCtx.fillStyle = 'rgb(230, 230, 230)';
+    canvasCtx.fillStyle = 'rgb(236, 236, 236)';
     canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
     canvasCtx.lineWidth = 2;
     canvasCtx.strokeStyle = 'rgb(0, 128, 173)';

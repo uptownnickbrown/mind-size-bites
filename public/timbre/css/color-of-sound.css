@@ -18,6 +18,11 @@ body {
   margin-right: auto;
 }
 
+.abstract {
+  font-size:1.15em;
+  font-weight:300;
+}
+
 hr {
   box-sizing:content-box;
   height: 1px;
@@ -89,6 +94,7 @@ a {
   left:-50px;
   border-bottom-right-radius: 4px;
   border-bottom-left-radius: 4px;
+  margin-bottom:25px;
 }
 .visualizer {
   background-color:#ececec;
@@ -98,4 +104,5 @@ a {
   left:-50px;
   border-top-right-radius: 4px;
   border-top-left-radius: 4px;
+  margin-bottom:-7px;
 }
