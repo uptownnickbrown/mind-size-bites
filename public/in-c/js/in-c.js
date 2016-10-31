@@ -681,7 +681,7 @@ function inC () {
 
   this.setupPerformer = function(id,mine) {
     if (mine) {
-      $('.performers').prepend('<div class="player" id="' + id + '"><button class="advance">Advance</button><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div></div>');
+      $('.performers').prepend('<div class="player" id="' + id + '"><button class="advance">Next Phrase</button><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div></div>');
       $('#' + id + ' .advance').click(function(e){
         e.preventDefault();
         self.advanceByOne(id);
