@@ -813,7 +813,7 @@ function inC () {
 
   $('.add').click(function(e){
     e.preventDefault();
-    var insts = ["marimba"];
+    var insts = [ "acoustic_bass","acoustic_grand_piano", "cello","kalimba","marimba","oboe","vibraphone", "viola"];
     var randInst = insts[Math.floor(Math.random()*insts.length)]
     function s4() {
       return Math.floor((1 + Math.random()) * 0x10000)
