@@ -1,5 +1,4 @@
-function inC () {
-
+function inC(sessionID) {
   // TODO externalize the score
   this.score = [
     {
@@ -629,42 +628,9 @@ function inC () {
 
   this.tempo = 240;
   this.performers = {};
-  // TODO store this in local storage so it persists across refreshes
-  this.myPerformers = [];
   this.availableChannel = 1;
-
-  var self = this;
-  firebase.database().ref("inC").once('value',function(snapshot) {
-    var inC = snapshot.val();
-    var session = inC.session;
-    if (session) {
-      self.tempo = inC.tempo;
-      self.availableChannel = inC.availableChannel;
-      self.performers = inC.performers;
-      var syncOnPerformerKey = Object.keys(self.performers).reduce(function(a, b){ return self.performers[a]['nextPhraseStart'] > self.performers[b]['nextPhraseStart'] ? b : a });
-      var normalizeToBeatNumber = self.performers[syncOnPerformerKey]['nextPhraseStart'];
-      Object.keys(self.performers).forEach(function(performerId) {
-        var performer = self.performers[performerId];
-        self.performers[performerId]['nextPhraseStart'] = performer['nextPhraseStart'] - (normalizeToBeatNumber - 4);
-        // TODO add detection for who owns this performer
-        self.setupPerformer(performerId,0);
-        MIDI.setVolume(performer.channel, 100);
-        MIDI.programChange(performer.channel, MIDI.GM.byName[performer.instrumentName].number);
-      });
-    }
-  });
-
-  firebase.database().ref("inC").on('child_changed',function(snapshot) {
-    var key = snapshot.key;
-    if (key == 'performers') {
-      var remotePerformers = snapshot.val();
-      Object.keys(self.performers).forEach(function(performerId) {
-        if (remotePerformers[performerId]['advanceToPhrase'] > self.performers[performerId]['currentPhrase'] && remotePerformers[performerId]['advanceToPhrase'] > self.performers[performerId]['advanceToPhrase']) {
-          self.advanceToPhrase(performerId,remotePerformers[performerId]['advanceToPhrase']);
-        }
-      });
-    }
-  });
+  var performerRef = firebase.database().ref("inC/" + sessionID + "/performers");
+  var sessionRef = firebase.database().ref("inC/" + sessionID);
 
   this.newPerformer = function(id,instrument,bot) {
     if (this.availableChannel > 15) {
@@ -673,6 +639,9 @@ function inC () {
     } else {
       // If someone is already playing, find out what beat # they're on and join in then.
       var normalizeToBeatNumber;
+      if (typeof self.performers === "undefined") {
+        self.performers = {};
+      }
       if (Object.keys(self.performers).length > 0) {
         var syncOnPerformerKey = Object.keys(self.performers).reduce(function(a, b){
           return self.performers[a]['nextPhraseStart'] > self.performers[b]['nextPhraseStart'] ? b : a
@@ -690,16 +659,13 @@ function inC () {
         "advanceToPhrase":1,
         "bot":bot ? 1 : 0
       };
-      if (bot == false) {
-        this.myPerformers.push(id);
-      }
       // Set up performer audio Channel
       MIDI.setVolume(this.availableChannel, 100);
       MIDI.programChange(this.availableChannel, MIDI.GM.byName[instrument].number);
       this.availableChannel += 1;
-      firebase.database().ref("inC/availableChannel").set(this.availableChannel);
-      firebase.database().ref("inC/performers").set(this.performers);
-      this.setupPerformer(id,1);
+      firebase.database().ref("inC/" + sessionID + "/availableChannel").set(this.availableChannel);
+      performerRef.set(this.performers);
+      self.setupPerformer(id,1);
     }
   };
 
@@ -727,12 +693,12 @@ function inC () {
 
   this.advanceByOne = function(id) {
     this.performers[id].advanceToPhrase += 1;
-    firebase.database().ref("inC/performers").set(this.performers);
+    performerRef.set(this.performers);
   };
 
   this.advanceToPhrase = function(id,phrase) {
     this.performers[id].advanceToPhrase = phrase;
-    firebase.database().ref("inC/performers").set(this.performers);
+    performerRef.set(this.performers);
   };
 
   this.progressPerformer = function(id) {
@@ -741,18 +707,55 @@ function inC () {
     if (self.performers[id].currentPhrase > 53) {
       self.removePerformer(id);
     }
-    firebase.database().ref("inC/performers").set(this.performers);
+    performerRef.set(this.performers);
   };
 
   this.removePerformer = function(id) {
     delete this.performers[id];
     $('#' + id + ' .advance button').remove();
     $('#' + id + ' .current img').attr("src", "./images/shh.jpg");
-    if (this.performers.length == 0) {
-      firebase.database().ref("inC/session").set(0);
-    }
-    firebase.database().ref("inC/performers").set(this.performers);
+    performerRef.set(this.performers);
   };
+
+  var self = null;
+  self = this;
+
+  sessionRef.once('value',function(snapshot) {
+    var sessionSnapshot = snapshot.val();
+    if (sessionSnapshot) {
+      self.tempo = sessionSnapshot.tempo;
+      self.availableChannel = sessionSnapshot.availableChannel;
+      self.performers = sessionSnapshot.performers;
+      if (self.performers) {
+        var syncOnPerformerKey = Object.keys(self.performers).reduce(function(a, b){ return self.performers[a]['nextPhraseStart'] > self.performers[b]['nextPhraseStart'] ? b : a });
+        var normalizeToBeatNumber = self.performers[syncOnPerformerKey]['nextPhraseStart'];
+        Object.keys(self.performers).forEach(function(performerId) {
+          var selfInLoop = self;
+          var performer = self.performers[performerId];
+          self.performers[performerId]['nextPhraseStart'] = performer['nextPhraseStart'] - (normalizeToBeatNumber - 4);
+          // TODO add detection for who owns this performer
+          self.setupPerformer(performerId,0);
+          MIDI.setVolume(performer.channel, 100);
+          MIDI.programChange(performer.channel, MIDI.GM.byName[performer.instrumentName].number);
+        });
+      }
+    } else {
+      firebase.database().ref("inC/" + sessionID + "/availableChannel").set(self.availableChannel);
+      firebase.database().ref("inC/" + sessionID + "/tempo").set(self.tempo);
+    }
+  });
+
+  sessionRef.on('child_changed',function(snapshot) {
+    var key = snapshot.key;
+    if (key == 'performers') {
+      var remotePerformers = snapshot.val();
+      Object.keys(self.performers).forEach(function(performerId) {
+        if (remotePerformers[performerId]['advanceToPhrase'] > self.performers[performerId]['currentPhrase'] && remotePerformers[performerId]['advanceToPhrase'] > self.performers[performerId]['advanceToPhrase']) {
+          self.advanceToPhrase(performerId,remotePerformers[performerId]['advanceToPhrase']);
+        }
+      });
+    }
+  });
 
   this.init = function() {
     var eighthNoteMilliseconds = 60 * 1000 / this.tempo;
@@ -826,12 +829,42 @@ function inC () {
       }
       beat += 1;
     }, eighthNoteMilliseconds / 2);
-  }
+    return metronome;
+  };
 
-
+  // store reference to beat timing setInterval
+  var metronome;
   $('.start').click(function(e){
     e.preventDefault();
-    self.init();
+    metronome = self.init();
+  });
+
+  $('.leave').click(function(e){
+    e.preventDefault();
+
+    // stop playing music
+    if (metronome) {
+      clearInterval(metronome);
+    }
+
+    // detach firebase event listeners
+    sessionRef.off();
+    performerRef.off();
+
+    // unbind events from buttons
+    $('.performers *').unbind();
+    $('.start').unbind();
+    $('.add').unbind();
+    $('.add-bot').unbind();
+    $('.leave').unbind();
+
+    // delete the active inC object
+    window.activeSession = null;
+
+    // clean up the UI
+    $('.inactive').removeClass('hidden');
+    $('.active-performance').addClass('hidden');
+    $('.performers').html('');
   });
 
   $('.add').click(function(e){
@@ -868,7 +901,45 @@ $(document).ready(function() {
 		soundfontUrl: "./audio/",
 		instruments: [ "acoustic_bass","acoustic_grand_piano", "cello","kalimba","marimba","oboe","vibraphone", "viola"],
 		onsuccess: function() {
-      window.inC = new inC();
+      $('.loader').addClass('hidden');
+      $('.inactive').removeClass('hidden');
+      $('.session-name').on('input',function(){
+        var sessionsRef = firebase.database().ref("inC");
+        sessionsRef.once('value',function(snapshot) {
+          var validSessions = Object.keys(snapshot.val());
+          var inputValue = $('.session-name').val();
+          if (inputValue == '') {
+            $('.create').off();
+            $('.create').addClass('disabled');
+            $('.join').off();
+            $('.join').addClass('disabled');
+          } else {
+            if ($.inArray(inputValue,validSessions) > -1) {
+              $('.join').removeClass('disabled');
+              $('.join').off();
+              $('.join').on('click',function(e){
+                e.preventDefault();
+                window.activeSession = new inC(inputValue);
+                $('.inactive').addClass('hidden');
+                $('.active-performance').removeClass('hidden');
+              });
+              $('.create').off();
+              $('.create').addClass('disabled');
+            } else {
+              $('.create').removeClass('disabled');
+              $('.create').off();
+              $('.create').on('click',function(e){
+                e.preventDefault();
+                window.activeSession = new inC(inputValue);
+                $('.inactive').addClass('hidden');
+                $('.active-performance').removeClass('hidden');
+              });
+              $('.join').off();
+              $('.join').addClass('disabled');
+            }
+          }
+        });
+      });
 		}
 	});
 });

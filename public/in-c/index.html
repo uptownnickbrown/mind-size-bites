@@ -41,17 +41,36 @@
 
 <hr />
         <h4>Play with your peers</h4>
-        <p>As no two recordings of <em>In C</em> are alike, the best way to understand the piece is to try it yourself. Click below to sync up with an ongoing performance of In C in the cloud, then click Join In! to add your own voice to the performance.</p>
-        <p>Click Next Phrase to move ahead to the next phrase, and remember to follow along with the score as your current phrase loops around itself. Have fun!</p>
-        <div class="controls">
-          <button class="start">
-            Listen
+        <p>As no two recordings of <em>In C</em> are alike, the best way to understand the piece is to try it yourself. Enter an existing performance ID below to sync up with an ongoing performance of In C in the cloud, then click Join In! to add your own voice to the performance. Or, create a new performance of your own and invite your friends!</p>
+        <div class="controls spinner">
+            <img class="loader" src="./images/loader.svg">
+        </div>
+        <div class="controls hidden inactive">
+          <div>
+            <input xmlns="http://www.w3.org/1999/xhtml" type="text" class="session-name" spellcheck="false"/>
+          </div>
+          <button class="join disabled">
+            Sync
           </button>
-          <button class="add">
-            Join in!
+          <button class="create disabled">
+            Create
           </button>
         </div>
-        <div class="performers">
+        <div class="active-performance hidden">
+          <div class="controls">
+            <button class="start">
+              Listen
+            </button>
+            <button class="add">
+              Join in!
+            </button>
+            <button class="leave">
+              Leave...
+            </button>
+          </div>
+          <p>Click Next Phrase to move ahead to the next phrase, and remember to follow along with the score as your current phrase loops around itself. Have fun!</p>
+          <div class="performers">
+          </div>
           <div class="controls">
             <p>No one home? Add a bot (or three!) to play <em>In C</em> with.</p>
             <button class="add-bot">
