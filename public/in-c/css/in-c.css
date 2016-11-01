@@ -9,6 +9,7 @@ body {
   font-size: 100%;
   color: #444;
   line-height: 1.5;
+  margin:0 24px 0 24px;
   background-color:white;
 }
 
@@ -72,6 +73,7 @@ button {
   color: #fff;
   font-size: 13px;
   font-weight: 700;
+  cursor:pointer;
 }
 
 a {
@@ -140,6 +142,7 @@ a {
 
 .disabled {
   background-color: #666;
+  cursor:default;
 }
 
 .current {
@@ -152,3 +155,55 @@ a {
   margin:0 auto;
   flex-grow: 2;
 }
+
+.hidden {
+  display:none;
+}
+
+.inactive {
+
+}
+
+.active-performance {
+
+}
+
+.session-name {
+  font-weight: 300;
+  border-radius: 0;
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  tap-highlight-color: #fff;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+  border-bottom: 1px solid #444;
+  height: 36px;
+  width:300px;
+  font-size:28px;
+  text-align: center;
+  padding-bottom: 3px;
+  -webkit-touch-callout: none;
+  -webkit-text-size-adjust: none;
+  -webkit-tap-highlight-color: transparent;
+  margin-bottom:15px;
+}
+
+.loader {
+  -webkit-animation: spin 1s linear infinite;
+  -moz-animation: spin 1s linear infinite;
+  animation: spin 1s linear infinite;
+}
+
+@-moz-keyframes spin {
+  100% {
+    -moz-transform: rotate(360deg); } }
+
+@-webkit-keyframes spin {
+  100% {
+    -webkit-transform: rotate(360deg); } }
+
+@keyframes spin {
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg); } }

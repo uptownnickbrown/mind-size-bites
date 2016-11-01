@@ -9,6 +9,7 @@ body {
   font-size: 100%;
   color: #444;
   line-height: 1.5;
+  margin:0 24px 0 24px;
   background-color:white;
 }
 
@@ -81,6 +82,7 @@ button {
   color: #fff;
   font-size: 13px;
   font-weight: 700;
+  cursor:pointer;
 }
 
 a {
