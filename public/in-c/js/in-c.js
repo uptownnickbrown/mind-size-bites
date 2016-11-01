@@ -577,37 +577,42 @@ function inC () {
     "461c9669-ef45-33e1-0b7b-a8bd7b6d7eee" : {
       "advanceToPhrase" : 9,
       "channel" : 2,
-      "currentPhrase" : 9,
+      "currentPhrase" : 6,
       "instrumentName" : "marimba",
-      "nextPhraseStart" : 38
+      "nextPhraseStart" : 38,
+      "bot" : 1
     },
     "b6df1e27-13ab-81dd-4a0f-142cc6e50bb4" : {
-      "advanceToPhrase" : 7,
+      "advanceToPhrase" : 8,
       "channel" : 3,
-      "currentPhrase" : 7,
+      "currentPhrase" : 2,
       "instrumentName" : "kalimba",
-      "nextPhraseStart" : 32
+      "nextPhraseStart" : 32,
+      "bot" : 0
     },
     "bdf9757b-840c-2f75-be99-738338c75031" : {
-      "advanceToPhrase" : 5,
+      "advanceToPhrase" : 7,
       "channel" : 4,
-      "currentPhrase" : 5,
+      "currentPhrase" : 4,
       "instrumentName" : "vibraphone",
-      "nextPhraseStart" : 6
+      "nextPhraseStart" : 6,
+      "bot" : 1
     },
     "dcc67053-16f8-936d-a999-d2a1aa37fe4d" : {
-      "advanceToPhrase" : 9,
+      "advanceToPhrase" : 7,
       "channel" : 5,
-      "currentPhrase" : 4,
+      "currentPhrase" : 2,
       "instrumentName" : "acoustic_bass",
-      "nextPhraseStart" : 10
+      "nextPhraseStart" : 10,
+      "bot" : 0
     },
     "deb656fd-670b-b947-db16-aacdb5ef3201" : {
-      "advanceToPhrase" : 12,
+      "advanceToPhrase" : 6,
       "channel" : 1,
-      "currentPhrase" : 9,
+      "currentPhrase" : 6,
       "instrumentName" : "acoustic_grand_piano",
-      "nextPhraseStart" : 4
+      "nextPhraseStart" : 4,
+      "bot" : 1
     }
   };
 
@@ -661,36 +666,49 @@ function inC () {
     }
   });
 
-  this.newPerformer = function(id,instrument) {
-    // If someone is already playing, find out what beat # they're on and join in then.
-    var normalizeToBeatNumber;
-    if (Object.keys(self.performers).length > 0) {
-      var syncOnPerformerKey = Object.keys(self.performers).reduce(function(a, b){
-        return self.performers[a]['nextPhraseStart'] > self.performers[b]['nextPhraseStart'] ? b : a
-      });
-      normalizeToBeatNumber = self.performers[syncOnPerformerKey]['nextPhraseStart'];
+  this.newPerformer = function(id,instrument,bot) {
+    if (this.availableChannel > 15) {
+      // TODO reassign channels, maybe add a reset button someone / remove bots
+      console.log('sorry, too many instruments!');
     } else {
-      normalizeToBeatNumber = 4;
+      // If someone is already playing, find out what beat # they're on and join in then.
+      var normalizeToBeatNumber;
+      if (Object.keys(self.performers).length > 0) {
+        var syncOnPerformerKey = Object.keys(self.performers).reduce(function(a, b){
+          return self.performers[a]['nextPhraseStart'] > self.performers[b]['nextPhraseStart'] ? b : a
+        });
+        normalizeToBeatNumber = self.performers[syncOnPerformerKey]['nextPhraseStart'];
+      } else {
+        normalizeToBeatNumber = 4;
+      }
+      // otherwise start after a few metronome ticks
+      this.performers[id] = {
+        "channel":this.availableChannel,
+        "instrumentName":instrument,
+        "currentPhrase":1,
+        "nextPhraseStart":normalizeToBeatNumber,
+        "advanceToPhrase":1,
+        "bot":bot ? 1 : 0
+      };
+      if (bot == false) {
+        this.myPerformers.push(id);
+      }
+      // Set up performer audio Channel
+      MIDI.setVolume(this.availableChannel, 100);
+      MIDI.programChange(this.availableChannel, MIDI.GM.byName[instrument].number);
+      this.availableChannel += 1;
+      firebase.database().ref("inC/availableChannel").set(this.availableChannel);
+      firebase.database().ref("inC/performers").set(this.performers);
+      this.setupPerformer(id,1);
     }
-    // otherwise start after a few metronome ticks
-    this.performers[id] = {
-      "channel":this.availableChannel,
-      "instrumentName":instrument,
-      "currentPhrase":1,
-      "nextPhraseStart":normalizeToBeatNumber,
-      "advanceToPhrase":1
-    };
-    this.myPerformers.push(id);
-    // Set up performer audio Channel
-    MIDI.setVolume(this.availableChannel, 100);
-    MIDI.programChange(this.availableChannel, MIDI.GM.byName[instrument].number);
-    this.availableChannel += 1;
-    firebase.database().ref("inC/availableChannel").set(this.availableChannel);
-    firebase.database().ref("inC/performers").set(this.performers);
-    this.setupPerformer(id,1);
-  }
+  };
 
   this.setupPerformer = function(id,mine) {
+    if (self.performers[id].bot) {
+      $('.performers').prepend('<div class="player" id="' + id + '"><div class="avatar"></div><div class="bot"><button class="disabled">Randomizing...</button></div><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div><div class="instrument"></div></div><hr />');
+      $('#' + id + ' .avatar').css("background-image","url('/in-c/images/bot.jpg')");
+      $('#' + id + ' .instrument').css("background-image","url('/in-c/images/" + self.performers[id].instrumentName + ".jpg')");
+    } else {
     if (mine) {
       $('.performers').prepend('<div class="player" id="' + id + '"><div class="avatar"></div><div class="advance"><button>Next Phrase</button></div><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div><div class="instrument"></div></div><hr />');
       $('#' + id + ' .avatar').css("background-image","url('https://api.adorable.io/avatars/75/" + id + ".png')");
@@ -700,9 +718,10 @@ function inC () {
         self.advanceByOne(id);
       });
     } else {
-      $('.performers').prepend('<div class="player" id="' + id + '"><div class="avatar"></div><div class="advance"></div><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div><div class="instrument"></div></div><hr />');
-      $('#' + id + ' .avatar').css("background-image","url('https://api.adorable.io/avatars/75/" + id + ".png')");
-      $('#' + id + ' .instrument').css("background-image","url('/in-c/images/" + self.performers[id].instrumentName + ".jpg')");
+        $('.performers').prepend('<div class="player" id="' + id + '"><div class="avatar"></div><div class="not-mine"><button class="disabled">Syncing</button></div><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div><div class="instrument"></div></div><hr />');
+        $('#' + id + ' .avatar').css("background-image","url('https://api.adorable.io/avatars/75/" + id + ".png')");
+        $('#' + id + ' .instrument').css("background-image","url('/in-c/images/" + self.performers[id].instrumentName + ".jpg')");
+      }
     }
   };
 
@@ -795,6 +814,10 @@ function inC () {
               MIDI.noteOff(instruction.channel, adjustedPitch, instruction.delay);
             }
           });
+        } else {
+          if (self.performers[id].bot == 1 && (Math.random() > .98)) {
+            self.advanceByOne(id);
+          }
         }
       });
       if (beat % 2 == 0) {
@@ -822,11 +845,22 @@ function inC () {
     }
     var randName = s4() + s4() + '-' + s4() + '-' + s4() + '-' +
       s4() + '-' + s4() + s4() + s4();
-    self.newPerformer(randName,randInst);
+    self.newPerformer(randName,randInst,false);
   });
 
-
-
+  $('.add-bot').click(function(e){
+    e.preventDefault();
+    var insts = [ "acoustic_bass","acoustic_grand_piano", "cello","kalimba","marimba","oboe","vibraphone", "viola"];
+    var randInst = insts[Math.floor(Math.random()*insts.length)]
+    function s4() {
+      return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+    }
+    var randName = s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+      s4() + '-' + s4() + s4() + s4();
+    self.newPerformer(randName,randInst,true);
+  });
 };
 
 $(document).ready(function() {

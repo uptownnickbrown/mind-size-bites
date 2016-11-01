@@ -124,6 +124,24 @@ a {
   width:110px;
 }
 
+.bot {
+  margin-left:16px;
+  margin-right:16px;
+  flex-shrink:0;
+  width:110px;
+}
+
+.not-mine {
+  margin-left:16px;
+  margin-right:16px;
+  flex-shrink:0;
+  width:110px;
+}
+
+.disabled {
+  background-color: #666;
+}
+
 .current {
   width: 100%;
   text-align: center;
