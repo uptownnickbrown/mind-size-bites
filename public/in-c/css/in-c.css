@@ -29,6 +29,7 @@ hr {
   background-color: #e4e4e4;
   line-height: 0;
   border: none;
+  clear:both;
 }
 
 h2 {
@@ -85,19 +86,51 @@ a {
 
 .performers {
   margin:25px auto;
-  width:85%;
+  width:100%;
 }
 
 .player {
   width:100%;
-  display:block;
+  height:120px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
   margin: 0 auto;
-  text-align:center;
+}
+
+.avatar, .instrument {
+  width: 60px;
+  height: 60px;
+  border-radius: 4px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  flex-shrink:0;
+}
+
+.avatar {
+
+}
+
+.instrument {
+  margin-left:16px;
+
+}
+
+.advance {
+  margin-left:16px;
+  margin-right:16px;
+  flex-shrink:0;
+  width:110px;
+}
+
+.current {
+  width: 100%;
+  text-align: center;
 }
 
 .current img {
   height:100px;
   margin:0 auto;
-  text-align:center;
-  display:block;
+  flex-grow: 2;
 }

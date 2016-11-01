@@ -585,30 +585,41 @@ function inC () {
       "advanceToPhrase" : 7,
       "channel" : 3,
       "currentPhrase" : 7,
-      "instrumentName" : "acoustic_grand_piano",
+      "instrumentName" : "kalimba",
       "nextPhraseStart" : 32
     },
     "bdf9757b-840c-2f75-be99-738338c75031" : {
       "advanceToPhrase" : 5,
       "channel" : 4,
       "currentPhrase" : 5,
-      "instrumentName" : "marimba",
+      "instrumentName" : "vibraphone",
       "nextPhraseStart" : 6
     },
     "dcc67053-16f8-936d-a999-d2a1aa37fe4d" : {
-      "advanceToPhrase" : 4,
+      "advanceToPhrase" : 9,
       "channel" : 5,
       "currentPhrase" : 4,
-      "instrumentName" : "oboe",
+      "instrumentName" : "acoustic_bass",
       "nextPhraseStart" : 10
     },
     "deb656fd-670b-b947-db16-aacdb5ef3201" : {
-      "advanceToPhrase" : 9,
+      "advanceToPhrase" : 12,
       "channel" : 1,
       "currentPhrase" : 9,
-      "instrumentName" : "viola",
+      "instrumentName" : "acoustic_grand_piano",
       "nextPhraseStart" : 4
     }
+  };
+
+  this.octaveMap = {
+    "acoustic_bass"         :-2,
+    "acoustic_grand_piano"  :-1,
+    "cello"                 :-1,
+    "kalimba"               : 1,
+    "marimba"               : 0,
+    "oboe"                  : 0,
+    "vibraphone"            : 1,
+    "viola"                 : 0
   };
 
   this.tempo = 240;
@@ -681,13 +692,17 @@ function inC () {
 
   this.setupPerformer = function(id,mine) {
     if (mine) {
-      $('.performers').prepend('<div class="player" id="' + id + '"><button class="advance">Next Phrase</button><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div></div>');
-      $('#' + id + ' .advance').click(function(e){
+      $('.performers').prepend('<div class="player" id="' + id + '"><div class="avatar"></div><div class="advance"><button>Next Phrase</button></div><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div><div class="instrument"></div></div><hr />');
+      $('#' + id + ' .avatar').css("background-image","url('https://api.adorable.io/avatars/75/" + id + ".png')");
+      $('#' + id + ' .instrument').css("background-image","url('/in-c/images/" + self.performers[id].instrumentName + ".jpg')");
+      $('#' + id + ' .advance button').click(function(e){
         e.preventDefault();
         self.advanceByOne(id);
       });
     } else {
-      $('.performers').append('<div class="player" id="' + id + '"><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div></div>');
+      $('.performers').prepend('<div class="player" id="' + id + '"><div class="avatar"></div><div class="advance"></div><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div><div class="instrument"></div></div><hr />');
+      $('#' + id + ' .avatar').css("background-image","url('https://api.adorable.io/avatars/75/" + id + ".png')");
+      $('#' + id + ' .instrument').css("background-image","url('/in-c/images/" + self.performers[id].instrumentName + ".jpg')");
     }
   };
 
@@ -712,7 +727,7 @@ function inC () {
 
   this.removePerformer = function(id) {
     delete this.performers[id];
-    $('#' + id + ' .advance').remove();
+    $('#' + id + ' .advance button').remove();
     $('#' + id + ' .current img').attr("src", "./images/shh.jpg");
     if (this.performers.length == 0) {
       firebase.database().ref("inC/session").set(0);
@@ -773,17 +788,18 @@ function inC () {
           });
           self.performers[id].nextPhraseStart = beat + phraseDuration * 2;
           phraseInstructions.forEach(function(instruction) {
+            var adjustedPitch = instruction.pitch + (12 * self.octaveMap[self.performers[id].instrumentName]);
             if (instruction.type == "on") {
-              MIDI.noteOn(instruction.channel, instruction.pitch, instruction.velocity, instruction.delay);
+              MIDI.noteOn(instruction.channel, adjustedPitch, instruction.velocity, instruction.delay);
             } else {
-              MIDI.noteOff(instruction.channel, instruction.pitch, instruction.delay);
+              MIDI.noteOff(instruction.channel, adjustedPitch, instruction.delay);
             }
           });
         }
       });
       if (beat % 2 == 0) {
-        MIDI.noteOn(0, 72, 100, 0);
-        MIDI.noteOff(0, 72, 0.25);
+        MIDI.noteOn(0, 72, 50, 0);
+        MIDI.noteOff(0, 72, 0.15);
       }
       beat += 1;
     }, eighthNoteMilliseconds / 2);
@@ -816,7 +832,7 @@ function inC () {
 $(document).ready(function() {
 	MIDI.loadPlugin({
 		soundfontUrl: "./audio/",
-		instruments: [ "acoustic_grand_piano", "oboe", "viola", "marimba"],
+		instruments: [ "acoustic_bass","acoustic_grand_piano", "cello","kalimba","marimba","oboe","vibraphone", "viola"],
 		onsuccess: function() {
       window.inC = new inC();
 		}
