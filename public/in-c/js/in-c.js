@@ -650,10 +650,8 @@ function inC(sessionID) {
           return self.performers[a]['nextPhraseStart'] > self.performers[b]['nextPhraseStart'] ? b : a
         });
         normalizeToBeatNumber = self.performers[syncOnPerformerKey]['nextPhraseStart'];
-        console.log('creating new performer synced to beat # ' + normalizeToBeatNumber);
       } else {
         normalizeToBeatNumber = self.currentBeat + 4;
-        console.log('creating new performer with beat = ' + normalizeToBeatNumber);
       }
 
       var channel;
@@ -685,12 +683,10 @@ function inC(sessionID) {
     // if it's mine, check if it's a bot or not
     if (mine) {
       if (self.performers[id].bot) {
-        console.log('making a bot of my own');
         $('.performers').prepend('<div class="player" id="' + id + '"><div class="avatar"></div><div class="bot"><button class="disabled">Randomizing...</button></div><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div><div class="instrument"></div></div><hr />');
         $('#' + id + ' .avatar').css("background-image","url('/in-c/images/bot.jpg')");
         $('#' + id + ' .instrument').css("background-image","url('/in-c/images/" + self.performers[id].instrumentName + ".jpg')");
       } else {
-        console.log('making a player of my own');
         $('.performers').prepend('<div class="player" id="' + id + '"><div class="avatar"></div><div class="advance"><button>Next Phrase</button></div><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div><div class="instrument"></div></div><hr />');
         $('#' + id + ' .avatar').css("background-image","url('https://api.adorable.io/avatars/75/" + id + ".png')");
         $('#' + id + ' .instrument').css("background-image","url('/in-c/images/" + self.performers[id].instrumentName + ".jpg')");
@@ -702,12 +698,10 @@ function inC(sessionID) {
     } else {
       // check again if it's a bot or not
       if (self.performers[id].bot) {
-        console.log('making a bot of someone elses');
         $('.performers').prepend('<div class="player" id="' + id + '"><div class="avatar"></div><div class="bot"><button class="disabled">Randomizing...</button></div><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div><div class="instrument"></div></div><hr />');
         $('#' + id + ' .avatar').css("background-image","url('/in-c/images/bot.jpg')");
         $('#' + id + ' .instrument').css("background-image","url('/in-c/images/" + self.performers[id].instrumentName + ".jpg')");
       } else {
-        console.log('syncing someone elses player');
         $('.performers').prepend('<div class="player" id="' + id + '"><div class="avatar"></div><div class="not-mine"><button class="disabled">Syncing</button></div><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div><div class="instrument"></div></div><hr />');
         $('#' + id + ' .avatar').css("background-image","url('https://api.adorable.io/avatars/75/" + id + ".png')");
         $('#' + id + ' .instrument').css("background-image","url('/in-c/images/" + self.performers[id].instrumentName + ".jpg')");
@@ -912,12 +906,10 @@ function inC(sessionID) {
         // remote performer exists in local, but has changed. update advanceToPhrase
         if ($.inArray(performerId,localPerformerIds) > -1) {
           if (remotePerformers[performerId]['advanceToPhrase'] > self.performers[performerId]['currentPhrase'] && remotePerformers[performerId]['advanceToPhrase'] > self.performers[performerId]['advanceToPhrase']) {
-            console.log('updated performer detected from remote, trying to update phrase');
             self.advanceToPhrase(performerId,remotePerformers[performerId]['advanceToPhrase']);
           }
         } else {
           // performer doesn't exist locally yet, create it
-          console.log('new performer detected from remote, trying to add it');
           if (remotePerformers[performerId]['bot']) {
             self.newPerformer(performerId,remotePerformers[performerId]['instrumentName'],true,remotePerformers[performerId]['channel'],false);
           }
