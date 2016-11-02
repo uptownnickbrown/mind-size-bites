@@ -912,8 +912,9 @@ function inC(sessionID) {
           // performer doesn't exist locally yet, create it
           if (remotePerformers[performerId]['bot']) {
             self.newPerformer(performerId,remotePerformers[performerId]['instrumentName'],true,remotePerformers[performerId]['channel'],false);
+          } else {
+            self.newPerformer(performerId,remotePerformers[performerId]['instrumentName'],false,remotePerformers[performerId]['channel'],false);
           }
-          self.newPerformer(performerId,remotePerformers[performerId]['instrumentName'],false,remotePerformers[performerId]['channel'],false);
         }
       });
     }
