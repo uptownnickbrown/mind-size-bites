@@ -629,12 +629,15 @@ function inC(sessionID) {
   this.tempo = 240;
   this.performers = {};
   this.availableChannel = 1;
+  this.currentBeat = 0;
   var performerRef = firebase.database().ref("inC/" + sessionID + "/performers");
   var sessionRef = firebase.database().ref("inC/" + sessionID);
+  var metronome;
 
-  this.newPerformer = function(id,instrument,bot) {
+  this.newPerformer = function(id,instrument,bot,remoteChannel,mine) {
     if (this.availableChannel > 15) {
       // TODO reassign channels, maybe add a reset button someone / remove bots
+      // really need a channel map somewhere
       console.log('sorry, too many instruments!');
     } else {
       // If someone is already playing, find out what beat # they're on and join in then.
@@ -647,12 +650,23 @@ function inC(sessionID) {
           return self.performers[a]['nextPhraseStart'] > self.performers[b]['nextPhraseStart'] ? b : a
         });
         normalizeToBeatNumber = self.performers[syncOnPerformerKey]['nextPhraseStart'];
+        console.log('creating new performer synced to beat # ' + normalizeToBeatNumber);
       } else {
-        normalizeToBeatNumber = 4;
+        normalizeToBeatNumber = self.currentBeat + 4;
+        console.log('creating new performer with beat = ' + normalizeToBeatNumber);
+      }
+
+      var channel;
+      if (remoteChannel) {
+        channel = remoteChannel;
+      } else {
+        channel = this.availableChannel;
+        this.availableChannel += 1;
+        firebase.database().ref("inC/" + sessionID + "/availableChannel").set(this.availableChannel);
       }
       // otherwise start after a few metronome ticks
       this.performers[id] = {
-        "channel":this.availableChannel,
+        "channel":channel,
         "instrumentName":instrument,
         "currentPhrase":1,
         "nextPhraseStart":normalizeToBeatNumber,
@@ -660,30 +674,40 @@ function inC(sessionID) {
         "bot":bot ? 1 : 0
       };
       // Set up performer audio Channel
-      MIDI.setVolume(this.availableChannel, 100);
-      MIDI.programChange(this.availableChannel, MIDI.GM.byName[instrument].number);
-      this.availableChannel += 1;
-      firebase.database().ref("inC/" + sessionID + "/availableChannel").set(this.availableChannel);
+      MIDI.setVolume(channel, 100);
+      MIDI.programChange(channel, MIDI.GM.byName[instrument].number);
       performerRef.set(this.performers);
-      self.setupPerformer(id,1);
+      self.setupPerformer(id,mine);
     }
   };
 
   this.setupPerformer = function(id,mine) {
-    if (self.performers[id].bot) {
-      $('.performers').prepend('<div class="player" id="' + id + '"><div class="avatar"></div><div class="bot"><button class="disabled">Randomizing...</button></div><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div><div class="instrument"></div></div><hr />');
-      $('#' + id + ' .avatar').css("background-image","url('/in-c/images/bot.jpg')");
-      $('#' + id + ' .instrument').css("background-image","url('/in-c/images/" + self.performers[id].instrumentName + ".jpg')");
-    } else {
+    // if it's mine, check if it's a bot or not
     if (mine) {
-      $('.performers').prepend('<div class="player" id="' + id + '"><div class="avatar"></div><div class="advance"><button>Next Phrase</button></div><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div><div class="instrument"></div></div><hr />');
-      $('#' + id + ' .avatar').css("background-image","url('https://api.adorable.io/avatars/75/" + id + ".png')");
-      $('#' + id + ' .instrument').css("background-image","url('/in-c/images/" + self.performers[id].instrumentName + ".jpg')");
-      $('#' + id + ' .advance button').click(function(e){
-        e.preventDefault();
-        self.advanceByOne(id);
-      });
+      if (self.performers[id].bot) {
+        console.log('making a bot of my own');
+        $('.performers').prepend('<div class="player" id="' + id + '"><div class="avatar"></div><div class="bot"><button class="disabled">Randomizing...</button></div><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div><div class="instrument"></div></div><hr />');
+        $('#' + id + ' .avatar').css("background-image","url('/in-c/images/bot.jpg')");
+        $('#' + id + ' .instrument').css("background-image","url('/in-c/images/" + self.performers[id].instrumentName + ".jpg')");
+      } else {
+        console.log('making a player of my own');
+        $('.performers').prepend('<div class="player" id="' + id + '"><div class="avatar"></div><div class="advance"><button>Next Phrase</button></div><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div><div class="instrument"></div></div><hr />');
+        $('#' + id + ' .avatar').css("background-image","url('https://api.adorable.io/avatars/75/" + id + ".png')");
+        $('#' + id + ' .instrument').css("background-image","url('/in-c/images/" + self.performers[id].instrumentName + ".jpg')");
+        $('#' + id + ' .advance button').click(function(e){
+          e.preventDefault();
+          self.advanceByOne(id);
+        });
+      }
     } else {
+      // check again if it's a bot or not
+      if (self.performers[id].bot) {
+        console.log('making a bot of someone elses');
+        $('.performers').prepend('<div class="player" id="' + id + '"><div class="avatar"></div><div class="bot"><button class="disabled">Randomizing...</button></div><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div><div class="instrument"></div></div><hr />');
+        $('#' + id + ' .avatar').css("background-image","url('/in-c/images/bot.jpg')");
+        $('#' + id + ' .instrument').css("background-image","url('/in-c/images/" + self.performers[id].instrumentName + ".jpg')");
+      } else {
+        console.log('syncing someone elses player');
         $('.performers').prepend('<div class="player" id="' + id + '"><div class="avatar"></div><div class="not-mine"><button class="disabled">Syncing</button></div><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div><div class="instrument"></div></div><hr />');
         $('#' + id + ' .avatar').css("background-image","url('https://api.adorable.io/avatars/75/" + id + ".png')");
         $('#' + id + ' .instrument').css("background-image","url('/in-c/images/" + self.performers[id].instrumentName + ".jpg')");
@@ -719,44 +743,6 @@ function inC(sessionID) {
 
   var self = null;
   self = this;
-
-  sessionRef.once('value',function(snapshot) {
-    var sessionSnapshot = snapshot.val();
-    if (sessionSnapshot) {
-      self.tempo = sessionSnapshot.tempo;
-      self.availableChannel = sessionSnapshot.availableChannel;
-      self.performers = sessionSnapshot.performers;
-      if (self.performers) {
-        var syncOnPerformerKey = Object.keys(self.performers).reduce(function(a, b){ return self.performers[a]['nextPhraseStart'] > self.performers[b]['nextPhraseStart'] ? b : a });
-        var normalizeToBeatNumber = self.performers[syncOnPerformerKey]['nextPhraseStart'];
-        Object.keys(self.performers).forEach(function(performerId) {
-          var selfInLoop = self;
-          var performer = self.performers[performerId];
-          self.performers[performerId]['nextPhraseStart'] = performer['nextPhraseStart'] - (normalizeToBeatNumber - 4);
-          // TODO add detection for who owns this performer
-          self.setupPerformer(performerId,0);
-          MIDI.setVolume(performer.channel, 100);
-          MIDI.programChange(performer.channel, MIDI.GM.byName[performer.instrumentName].number);
-        });
-      }
-    } else {
-      firebase.database().ref("inC/" + sessionID + "/availableChannel").set(self.availableChannel);
-      firebase.database().ref("inC/" + sessionID + "/tempo").set(self.tempo);
-    }
-  });
-
-  sessionRef.on('child_changed',function(snapshot) {
-    var key = snapshot.key;
-    if (key == 'performers') {
-      var remotePerformers = snapshot.val();
-      Object.keys(self.performers).forEach(function(performerId) {
-        if (remotePerformers[performerId]['advanceToPhrase'] > self.performers[performerId]['currentPhrase'] && remotePerformers[performerId]['advanceToPhrase'] > self.performers[performerId]['advanceToPhrase']) {
-          self.advanceToPhrase(performerId,remotePerformers[performerId]['advanceToPhrase']);
-        }
-      });
-    }
-  });
-
   this.init = function() {
     var eighthNoteMilliseconds = 60 * 1000 / this.tempo;
 
@@ -818,7 +804,7 @@ function inC(sessionID) {
             }
           });
         } else {
-          if (self.performers[id].bot == 1 && (Math.random() > .98)) {
+          if (self.performers[id].bot == 1 && (Math.random() > .975)) {
             self.advanceByOne(id);
           }
         }
@@ -828,16 +814,11 @@ function inC(sessionID) {
         MIDI.noteOff(0, 72, 0.15);
       }
       beat += 1;
+      self.currentBeat += 1;
     }, eighthNoteMilliseconds / 2);
     return metronome;
   };
 
-  // store reference to beat timing setInterval
-  var metronome;
-  $('.start').click(function(e){
-    e.preventDefault();
-    metronome = self.init();
-  });
 
   $('.leave').click(function(e){
     e.preventDefault();
@@ -853,7 +834,6 @@ function inC(sessionID) {
 
     // unbind events from buttons
     $('.performers *').unbind();
-    $('.start').unbind();
     $('.add').unbind();
     $('.add-bot').unbind();
     $('.leave').unbind();
@@ -878,7 +858,7 @@ function inC(sessionID) {
     }
     var randName = s4() + s4() + '-' + s4() + '-' + s4() + '-' +
       s4() + '-' + s4() + s4() + s4();
-    self.newPerformer(randName,randInst,false);
+    self.newPerformer(randName,randInst,false,false,true);
   });
 
   $('.add-bot').click(function(e){
@@ -892,7 +872,59 @@ function inC(sessionID) {
     }
     var randName = s4() + s4() + '-' + s4() + '-' + s4() + '-' +
       s4() + '-' + s4() + s4() + s4();
-    self.newPerformer(randName,randInst,true);
+    self.newPerformer(randName,randInst,true,false,false);
+  });
+
+  sessionRef.once('value',function(snapshot) {
+    var sessionSnapshot = snapshot.val();
+    if (sessionSnapshot) {
+      self.tempo = sessionSnapshot.tempo;
+      self.availableChannel = sessionSnapshot.availableChannel;
+      self.performers = sessionSnapshot.performers;
+      if (self.performers) {
+        var syncOnPerformerKey = Object.keys(self.performers).reduce(function(a, b){ return self.performers[a]['nextPhraseStart'] > self.performers[b]['nextPhraseStart'] ? b : a });
+        var normalizeToBeatNumber = self.performers[syncOnPerformerKey]['nextPhraseStart'];
+        Object.keys(self.performers).forEach(function(performerId) {
+          var selfInLoop = self;
+          var performer = self.performers[performerId];
+          self.performers[performerId]['nextPhraseStart'] = performer['nextPhraseStart'] - (normalizeToBeatNumber - 4);
+          // TODO add detection for who owns this performer
+          self.setupPerformer(performerId,0);
+          MIDI.setVolume(performer.channel, 100);
+          MIDI.programChange(performer.channel, MIDI.GM.byName[performer.instrumentName].number);
+        });
+      }
+    } else {
+      firebase.database().ref("inC/" + sessionID + "/availableChannel").set(self.availableChannel);
+      firebase.database().ref("inC/" + sessionID + "/tempo").set(self.tempo);
+    }
+    // start playing as soon as we've synced all performers
+    metronome = self.init();
+  });
+
+  sessionRef.on('child_changed',function(snapshot) {
+    var key = snapshot.key;
+    if (key == 'performers') {
+      var remotePerformers = snapshot.val();
+      var remotePerformerIds = Object.keys(remotePerformers);
+      var localPerformerIds = Object.keys(self.performers);
+      remotePerformerIds.forEach(function(performerId) {
+        // remote performer exists in local, but has changed. update advanceToPhrase
+        if ($.inArray(performerId,localPerformerIds) > -1) {
+          if (remotePerformers[performerId]['advanceToPhrase'] > self.performers[performerId]['currentPhrase'] && remotePerformers[performerId]['advanceToPhrase'] > self.performers[performerId]['advanceToPhrase']) {
+            console.log('updated performer detected from remote, trying to update phrase');
+            self.advanceToPhrase(performerId,remotePerformers[performerId]['advanceToPhrase']);
+          }
+        } else {
+          // performer doesn't exist locally yet, create it
+          console.log('new performer detected from remote, trying to add it');
+          if (remotePerformers[performerId]['bot']) {
+            self.newPerformer(performerId,remotePerformers[performerId]['instrumentName'],true,remotePerformers[performerId]['channel'],false);
+          }
+          self.newPerformer(performerId,remotePerformers[performerId]['instrumentName'],false,remotePerformers[performerId]['channel'],false);
+        }
+      });
+    }
   });
 };
 
