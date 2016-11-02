@@ -116,7 +116,8 @@ a {
 }
 
 .embed {
-  margin-top:15px;
+  margin:15px auto 0;
   width:92%;
+  display:block;
   height:520px;
 }

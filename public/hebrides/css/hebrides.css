@@ -144,8 +144,7 @@ button {
 
 #score-canvas {
   display:block;
-  margin:10px auto;
-  width:660px;
+  margin:0 auto;
 }
 
 #bpm {
