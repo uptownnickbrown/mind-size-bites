@@ -651,7 +651,7 @@ function inC(sessionID) {
         });
         normalizeToBeatNumber = self.performers[syncOnPerformerKey]['nextPhraseStart'];
       } else {
-        normalizeToBeatNumber = self.currentBeat + 4;
+        normalizeToBeatNumber = self.currentBeat + 4 - (self.currentBeat % 4);
       }
 
       var channel;
