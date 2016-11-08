@@ -684,12 +684,12 @@ function inC(sessionID) {
     if (mine) {
       if (self.performers[id].bot) {
         $('.performers').prepend('<div class="player" id="' + id + '"><div class="avatar"></div><div class="bot"><button class="disabled">Randomizing...</button></div><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div><div class="instrument"></div></div><hr />');
-        $('#' + id + ' .avatar').css("background-image","url('/in-c/images/bot.jpg')");
-        $('#' + id + ' .instrument').css("background-image","url('/in-c/images/" + self.performers[id].instrumentName + ".jpg')");
+        $('#' + id + ' .avatar').css("background-image","url('./images/bot.jpg')");
+        $('#' + id + ' .instrument').css("background-image","url('./images/" + self.performers[id].instrumentName + ".jpg')");
       } else {
         $('.performers').prepend('<div class="player" id="' + id + '"><div class="avatar"></div><div class="advance"><button>Next Phrase</button></div><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div><div class="instrument"></div></div><hr />');
         $('#' + id + ' .avatar').css("background-image","url('https://api.adorable.io/avatars/75/" + id + ".png')");
-        $('#' + id + ' .instrument').css("background-image","url('/in-c/images/" + self.performers[id].instrumentName + ".jpg')");
+        $('#' + id + ' .instrument').css("background-image","url('./images/" + self.performers[id].instrumentName + ".jpg')");
         $('#' + id + ' .advance button').click(function(e){
           e.preventDefault();
           self.advanceByOne(id);
@@ -699,12 +699,12 @@ function inC(sessionID) {
       // check again if it's a bot or not
       if (self.performers[id].bot) {
         $('.performers').prepend('<div class="player" id="' + id + '"><div class="avatar"></div><div class="bot"><button class="disabled">Randomizing...</button></div><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div><div class="instrument"></div></div><hr />');
-        $('#' + id + ' .avatar').css("background-image","url('/in-c/images/bot.jpg')");
-        $('#' + id + ' .instrument').css("background-image","url('/in-c/images/" + self.performers[id].instrumentName + ".jpg')");
+        $('#' + id + ' .avatar').css("background-image","url('./images/bot.jpg')");
+        $('#' + id + ' .instrument').css("background-image","url('./images/" + self.performers[id].instrumentName + ".jpg')");
       } else {
         $('.performers').prepend('<div class="player" id="' + id + '"><div class="avatar"></div><div class="not-mine"><button class="disabled">Syncing</button></div><div class="current"><img src="./images/' + self.performers[id]['currentPhrase'] + '.png" /></div><div class="instrument"></div></div><hr />');
         $('#' + id + ' .avatar').css("background-image","url('https://api.adorable.io/avatars/75/" + id + ".png')");
-        $('#' + id + ' .instrument').css("background-image","url('/in-c/images/" + self.performers[id].instrumentName + ".jpg')");
+        $('#' + id + ' .instrument').css("background-image","url('./images/" + self.performers[id].instrumentName + ".jpg')");
       }
     }
   };

@@ -13,7 +13,7 @@
   <item id="file_43609527" href="toc.xhtml" properties="nav" media-type="application/xhtml+xml"/>
 	<item id="file_43609790" href="baton.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
 	<item id="file_43610656" href="hebrides.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
-	<item id="file_43610657" href="in-c.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+	<item id="file_43610657" href="in-c.xhtml" media-type="application/xhtml+xml" properties="scripted svg"/>
 	<item id="file_43610659" href="timbre.xhtml" media-type="application/xhtml+xml" properties="scripted remote-resources"/>
 	<item id="file_43609909" href="audio/acoustic_bass-mp3.js" media-type="application/javascript" />
 	<item id="file_43609910" href="audio/acoustic_bass-ogg.js" media-type="application/javascript" />
@@ -803,7 +803,7 @@
 	<item id="file_43610673" href="images/flute.png" media-type="image/png" />
 	<item id="file_43609798" href="images/full-score.pdf" media-type="image/pdf" />
 	<item id="file_43610609" href="images/kalimba.jpg" media-type="image/jpeg" />
-	<item id="file_43610610" href="images/loader.svg" media-type="image/svg" />
+	<item id="file_43610610" href="images/loader.svg" media-type="image/svg+xml" />
 	<item id="file_43610611" href="images/marimba.jpg" media-type="image/jpeg" />
 	<item id="file_43610612" href="images/oboe.jpg" media-type="image/jpeg" />
 	<item id="file_43610674" href="images/saxophone.png" media-type="image/png" />
@@ -842,7 +842,7 @@
 	<spine>
 		<itemref idref="file_43610656" />
 		<itemref idref="file_43609790" />
+    <itemref idref="file_43610659" />
 		<itemref idref="file_43610657" />
-		<itemref idref="file_43610659" />
 	</spine>
 </package>
