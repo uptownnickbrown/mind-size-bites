@@ -1,0 +1,172 @@
+* {
+  box-sizing:border-box;
+}
+
+body {
+  padding: 0;
+  border: 0;
+  font-family: roboto,Sans-Serif;
+  font-size: 100%;
+  color: #444;
+  line-height: 1.5;
+  margin:0 24px 0 24px;
+  background-color:white;
+}
+
+.container {
+  max-width: 768px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.abstract {
+  font-size:1.15em;
+  font-weight:300;
+}
+
+hr {
+  box-sizing:content-box;
+  height: 1px;
+  background-color: #e4e4e4;
+  line-height: 0;
+  border: none;
+}
+
+h2 {
+  margin-top:35px;
+  margin-bottom:25px;
+  font-size: 1.5em;
+  font-weight: 300;
+}
+
+h4 {
+  font-size: 1.2em;
+  font-weight: 500;
+  margin-bottom:0;
+}
+
+p,li,label {
+  font-size: .875em;
+}
+
+.inset-image {
+  float: left;
+  max-width:50%;
+  text-align:center;
+  width:100%;
+  margin-right:25px;
+  margin-top:25px;
+  display:block;
+}
+
+.timer {
+  display:none;
+}
+
+.video-controls {
+  margin: 10px auto;
+  display:block;
+  text-align:center;
+}
+
+.score-controls {
+  margin: 10px auto;
+  display:block;
+  text-align:center;
+}
+
+.audio-controls {
+  margin: 10px auto;
+  text-align: center;
+}
+
+.tap-controls {
+  margin: 10px auto;
+  display:block;
+  text-align:center;
+}
+
+button {
+  display: inline-block;
+  margin: 6px;
+  padding: 0;
+  border: none;
+  width: 110px;
+  height: 40px;
+  border-radius: 4px;
+  background-color: #007fad;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor:pointer;
+}
+
+.video-controls button {
+  display: inline-block;
+  border-radius: 4px;
+  background-color: #007fad;
+  color: #fff;
+  padding: 0;
+  width: 336px;
+  height:40px;
+  line-height:40px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.volume-slider {
+  display:inline-block;
+  border-radius: 4px;
+  background-color: #007fad;
+  color: #fff;
+  margin: 6px 6px 0 6px;
+  padding: 0;
+  width: 232px;
+  height:40px;
+  line-height:40px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.volume-slider span {
+  position: relative;
+  top: -2px;
+}
+
+#gain {
+  margin:12px 0 0 15px;
+}
+
+#video-player {
+  display:none;
+  margin: 25px auto;
+}
+
+#score-canvas {
+  display:block;
+  margin:0 auto;
+}
+
+#bpm {
+  font-weight:700;
+}
+
+a {
+  color: rgb(0, 127, 173);
+  text-decoration: none;
+}
+
+input[type=checkbox] {
+  transform: scale(1.5);
+  padding: 10px;
+  margin-right: 6px;
+}
+
+/* baton styles */
+
+.conductaire {
+  margin:0px auto;
+  text-align:center;
+  display:block;
+  width:80%;
+}
