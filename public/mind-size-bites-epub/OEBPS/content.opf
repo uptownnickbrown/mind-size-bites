@@ -5,7 +5,7 @@
 	<dc:creator>Nick Brown</dc:creator>
   <dc:language>en</dc:language>
   <dc:identifier id="pub-id">urn:isbn:think-outside-the-textbook</dc:identifier>
-	<meta property="dcterms:modified">2016-11-08</meta>
+	<meta property="dcterms:modified">2016-11-08T21:26:35Z</meta>
 </metadata>
 <manifest>
   <item id="file_43609623" href="content.opf" media-type="application/oebps-package+xml" />
@@ -14,7 +14,7 @@
 	<item id="file_43609790" href="baton.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
 	<item id="file_43610656" href="hebrides.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
 	<item id="file_43610657" href="in-c.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
-	<item id="file_43610659" href="timbre.xhtml" media-type="application/xhtml+xml" properties="scripted"/>/>
+	<item id="file_43610659" href="timbre.xhtml" media-type="application/xhtml+xml" properties="scripted remote-resources"/>
 	<item id="file_43609909" href="audio/acoustic_bass-mp3.js" media-type="application/javascript" />
 	<item id="file_43609910" href="audio/acoustic_bass-ogg.js" media-type="application/javascript" />
 	<item id="file_43610001" href="audio/acoustic_grand_piano-mp3.js" media-type="application/javascript" />
@@ -841,6 +841,7 @@
 </manifest>
 	<spine>
 		<itemref idref="file_43610656" />
+		<itemref idref="file_43609790" />
 		<itemref idref="file_43610657" />
 		<itemref idref="file_43610659" />
 	</spine>
