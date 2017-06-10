@@ -25,12 +25,13 @@ Timbre:
 * ~~stretch goal...add live voice capture with audio analysis~~
 
 In C:
-* add boilerplate content on In C
+* ~~add boilerplate content on In C~~
 https://cnx.org/contents/hIRWxta7@1/Chapter-5--European-and-Americ
 * ~~iframe in teropa's in C? http://teropa.info/in-c/~~
 * ~~stretch goal...build the live collaborative In C across the network http://blog.gleitzman.com/post/63283830260/midijs-playing-audio-in-the-browser-with~~
+* ~~join sessionized performances~~
 
 LearnKit:
 * ~~Re-order LearnKit slides: 0 -> 4 -> 6 -> 2 -> 3~~
 * embed snippet viewer with sliders for start / stop point
-* create some GPS content for my ingested music book?
+* ~~create some GPS content for my ingested music book?~~

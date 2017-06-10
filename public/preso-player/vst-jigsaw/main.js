@@ -39,12 +39,12 @@ function configOptions() {
         });
         $('.arrow').css('display', 'block');
     }
-    
+
     if (parseInt(urlParams.height) > 0) {
         console.log('setting height to ' + urlParams.height + ' pixels.');
         $("#content").css('height',urlParams.height);
     }
-    
+
     if (parseInt(urlParams.width) > 0) {
         console.log('setting width to ' + urlParams.width + ' pixels.');
         $("#content").css('width',urlParams.width);
@@ -94,7 +94,7 @@ function JigsawCtrl(vbidParam, pageParam) {
             el: "content",
             page: pageParam,
             brand: "MVJ",
-            highlightsEnabled: true
+            highlightsEnabled: false
         }, viewer_ready);
         configOptions();
     }
@@ -112,12 +112,12 @@ function JigsawCtrl(vbidParam, pageParam) {
 
     this.listHighlights = function () {
         this.Jigsaw.Book.getHighlights(function (response) {
-            
+
             var highlights = response.data.highlights,
                 markers = response.data.markers,
                 colorLookup = {},
                 $target = $('.my-notebook');
-            
+
             for (i in markers) {
                 colorLookup[markers[i].globalId] = markers[i].color80;
             }

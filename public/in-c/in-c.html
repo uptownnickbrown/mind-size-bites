@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>In C by Terry Riley</title>
+    <link rel="stylesheet" href="./css/in-c.css" />
+    <!-- polyfill -->
+    <script src="./midi-js/shim/Base64.js" type="text/javascript"></script>
+    <script src="./midi-js/shim/Base64binary.js" type="text/javascript"></script>
+    <script src="./midi-js/shim/WebAudioAPI.js" type="text/javascript"></script>
+    <!-- midi.js package -->
+    <script src="./midi-js/midi/audioDetect.js" type="text/javascript"></script>
+    <script src="./midi-js/midi/gm.js" type="text/javascript"></script>
+    <script src="./midi-js/midi/loader.js" type="text/javascript"></script>
+    <script src="./midi-js/midi/plugin.audiotag.js" type="text/javascript"></script>
+    <script src="./midi-js/midi/plugin.webaudio.js" type="text/javascript"></script>
+    <script src="./midi-js/midi/plugin.webmidi.js" type="text/javascript"></script>
+    <!-- utils -->
+    <script src="./midi-js/util/dom_request_xhr.js" type="text/javascript"></script>
+    <script src="./midi-js/util/dom_request_script.js" type="text/javascript"></script>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2><em>In C</em></h2>
+        <p class="abstract">A collaborative, networked educational concert performance.</p>
+        <hr />
+        <img class="inset-image" src="./images/terry.jpg" />
+        <h4>Introduction</h4>
+        <p><em>In C</em> is a musical piece composed by Terry Riley in 1964 for an indefinite number of performers. He suggests "a group of about 35 is desired if possible but smaller or larger groups will work". A series of short melodic fragments, In C is a response to the abstract academic serialist techniques devised by Schoenberg that dominated Western university composers for many decades and is often cited as the first minimalist composition (though La Monte Young's drone compositions preceded it by several years, In C had a greater impact on public consciousness)</p>
+        <h4>Technique</h4>
+        <p>In C consists of 53 short, numbered musical phrases, lasting from half a beat to 32 beats; each phrase may be repeated an arbitrary number of times. Each musician has control over which phrase they play: players are encouraged to play the phrases starting at different times, even if they are playing the same phrase. In this way, although the melodic content of each part is predetermined, In C has elements of aleatoric music to it. The performance directions state that the musical ensemble should try to stay within two to three phrases of each other. The phrases must be played in order, although some may be skipped. As detailed in some editions of the score, it is customary for one musician ("traditionally... a beautiful girl," Riley notes in the score) to play the note C in repeated eighth notes, typically on a piano or pitched-percussion instrument (e.g. marimba). This functions as a metronome and is referred to as "The Pulse". Steve Reich introduced the idea of a rhythmic pulse to Riley, who accepted it, thus radically altering the original composition by Riley which had no rhythm.</p>
+
+<p>In C has no set duration; performances can last as little as fifteen minutes or as long as several hours, although Riley indicates "performances normally average between 45 minutes and an hour and a half." The number of performers may also vary between any two performances. The original recording of the piece was created by 11 musicians (although, through overdubbing, several dozen instruments were utilized), while a performance in 2006 at the Walt Disney Concert Hall featured 124 musicians.</p>
+
+<p>The piece begins on a C major chord (patterns one through seven) with a strong emphasis on the mediant E and the entrance of the note F which begins a series of slow progressions to other chords suggesting a few subtle and ambiguous changes of key, the last pattern being an alteration between B♭ and G. Though the polyphonic interplay of the various patterns against each other and themselves at different rhythmic displacements is of primary interest, the piece may be considered heterophonic.</p>
+
+<hr />
+        <h4>Play with your peers</h4>
+        <p>As no two recordings of <em>In C</em> are alike, the best way to understand the piece is to try it yourself. Enter an existing performance ID below to sync up with an ongoing performance of In C in the cloud, then click Join In! to add your own voice to the performance. Or, create a new performance of your own and invite your friends!</p>
+        <div class="controls spinner">
+            <img class="loader" src="./images/loader.svg">
+        </div>
+        <div class="controls hidden inactive">
+          <div>
+            <input xmlns="http://www.w3.org/1999/xhtml" type="text" class="session-name" spellcheck="false"/>
+          </div>
+          <button class="join disabled">
+            Sync
+          </button>
+          <button class="create disabled">
+            Create
+          </button>
+        </div>
+        <div class="active-performance hidden">
+          <div class="controls">
+            <button class="add">
+              Join in!
+            </button>
+            <button class="leave">
+              Leave...
+            </button>
+          </div>
+          <p>Click Next Phrase to move ahead to the next phrase, and remember to follow along with the score as your current phrase loops around itself. Have fun!</p>
+          <div class="performers">
+          </div>
+          <div class="controls">
+            <p>No one home? Add a bot (or three!) to play <em>In C</em> with.</p>
+            <button class="add-bot">
+              Add bot
+            </button>
+          </div>
+        </div>
+        <hr />
+        <h4>What's Next?</h4>
+        <p>A discussion of the In C remixing project including music played from three of the remixed versions can be heard in Radiolab's podcast on In C from December 14, 2009.[8] The remixers included Jad Abumrad, Mason Bates, Jack Dangers, Dennis DeSantis, R. Luke DuBois, Mikael Karlsson/Rob Stephenson, Zoë Keating, Phil Kline, Kleerup, Glenn Kotche, David Lang, Michael Lowenstern, Paul D. Miller (DJ Spooky), Nico Muhly, Todd Reynolds and Daniel Bernard Roumain (DBR). In the next chapter we will dive into the podcast and listen to the nuances of the piece brought our by each remixer.</p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/3.5.0/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyAR3kyou3GlkfunnK2GPQ4r6b432Y6u6EE",
+        databaseURL: "https://mind-sized-bites.firebaseio.com"
+      };
+      firebase.initializeApp(config);
+    </script>
+    <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+    <script src="./js/in-c.js"></script>
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-61422873-2', 'auto');
+    ga('send', 'pageview');
+
+    </script>
+</body>
+
+</html>
