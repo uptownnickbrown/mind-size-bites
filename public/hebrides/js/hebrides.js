@@ -261,7 +261,7 @@ $(document).ready(function() {
     $('.previous-page').click(previousPage);
     $('.next-page').click(nextPage);
 
-    PDFJS.getDocument(scoreURL).then(function (pdfDoc_) {
+    pdfjsLib.getDocument(scoreURL).then(function (pdfDoc_) {
       pdfDoc = pdfDoc_;
       renderPage(pageNum);
     });
